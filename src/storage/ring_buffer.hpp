@@ -1,4 +1,5 @@
 #pragma once
+#include "blackbox/event.hpp"
 #include <vector>
 #include <atomic>
 #include <optional>
@@ -6,42 +7,21 @@
 
 namespace blackbox::storage {
 
-template <typename T, size_t Capacity>
-class LockFreeRingBuffer {
+class EventRingBuffer {
 public:
-    LockFreeRingBuffer() : head_(0), tail_(0) {
-        buffer_.resize(Capacity);
-    }
+    explicit EventRingBuffer(size_t capacity = 1024);
+    ~EventRingBuffer() = default;
 
-    bool push(const T& item) {
-        size_t current_tail = tail_.load(std::memory_order_relaxed);
-        size_t next_tail = (current_tail + 1) % Capacity;
-
-        if (next_tail == head_.load(std::memory_order_acquire)) {
-            return false; // Queue is full
-        }
-
-        buffer_[current_tail] = item;
-        tail_.store(next_tail, std::memory_order_release);
-        return true;
-    }
-
-    std::optional<T> pop() {
-        size_t current_head = head_.load(std::memory_order_relaxed);
-
-        if (current_head == tail_.load(std::memory_order_acquire)) {
-            return std::nullopt; // Queue is empty
-        }
-
-        T item = buffer_[current_head];
-        head_.store((current_head + 1) % Capacity, std::memory_order_release);
-        return item;
-    }
+    bool push(const SecurityEvent& event);
+    std::optional<SecurityEvent> pop();
+    size_t capacity() const { return capacity_; }
+    size_t size() const;
 
 private:
-    std::vector<T> buffer_;
-    std::atomic<size_t> head_;
-    std::atomic<size_t> tail_;
+    size_t capacity_;
+    std::vector<SecurityEvent> buffer_;
+    std::atomic<size_t> head_{0};
+    std::atomic<size_t> tail_{0};
 };
 
 } // namespace blackbox::storage
