@@ -1,25 +1,25 @@
 #pragma once
 #include "blackbox/event.hpp"
-#include "storage/ring_buffer.hpp"
-#include <string>
 #include <atomic>
+#include <thread>
+#include <functional>
 
 namespace blackbox::ingest {
 
 class NetworkIngest {
 public:
-    NetworkIngest(const std::string& interface_name, storage::LockFreeRingBuffer<SecurityEvent, 1024>& queue);
+    using EventCallback = std::function<void(const SecurityEvent&)>;
+
+    explicit NetworkIngest(std::string interface_name);
     ~NetworkIngest();
 
-    void start();
+    void start(EventCallback callback);
     void stop();
 
 private:
-    void capture_loop();
-
-    std::string interface_;
-    storage::LockFreeRingBuffer<SecurityEvent, 1024>& queue_;
+    std::string interface_name_;
     std::atomic<bool> running_{false};
+    std::thread capture_thread_;
 };
 
 } // namespace blackbox::ingest
