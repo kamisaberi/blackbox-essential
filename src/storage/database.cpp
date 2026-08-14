@@ -3,7 +3,30 @@
 
 namespace blackbox::storage {
 
-Database::Database(const std::string& db_path) : db_path_(db_path) {}
+Database::Database(const std::string& db_path) {
+    if (sqlite3_open(db_path.c_str(), &db_) != SQLITE_OK) {
+        std::cerr << "[Database Error] Cannot open database: " << sqlite3_errmsg(db_) << std::endl;
+        db_ = nullptr;
+        return;
+    }
+
+    const char* sql_create = "CREATE TABLE IF NOT EXISTS audit_logs ("
+                             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                             "event_id INTEGER, "
+                             "type INTEGER, "
+                             "source_ip TEXT, "
+                             "anomaly_score REAL, "
+                             "action INTEGER, "
+                             "description TEXT);";
+
+    char* err_msg = nullptr;
+    if (sqlite3_exec(db_, sql_create, nullptr, nullptr, &err_msg) != SQLITE_OK) {
+        std::cerr << "[Database Error] Table creation failed: " << err_msg << std::endl;
+        sqlite3_free(err_msg);
+    } else {
+        std::cout << "[Database] Encrypted SQLite Audit Storage initialized at: " << db_path << std::endl;
+    }
+}
 
 Database::~Database() {
     if (db_) {
@@ -11,50 +34,20 @@ Database::~Database() {
     }
 }
 
-bool Database::init() {
-    std::lock_guard<std::mutex> lock(db_mutex_);
-    int rc = sqlite3_open(db_path_.c_str(), &db_);
-    if (rc != SQLITE_OK) {
-        std::cerr << "[Database Error] Cannot open SQLite DB: " << sqlite3_errmsg(db_) << std::endl;
-        return false;
-    }
-
-    const char* create_sql = 
-        "CREATE TABLE IF NOT EXISTS audit_logs ("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "timestamp INTEGER,"
-        "source_ip TEXT,"
-        "threat_level TEXT,"
-        "anomaly_score REAL,"
-        "description TEXT"
-        ");";
-
-    char* err_msg = nullptr;
-    rc = sqlite3_exec(db_, create_sql, 0, 0, &err_msg);
-    if (rc != SQLITE_OK) {
-        std::cerr << "[Database Error] Table creation failed: " << err_msg << std::endl;
-        sqlite3_free(err_msg);
-        return false;
-    }
-
-    std::cout << "[Database] Encrypted Audit Store initialized at: " << db_path_ << std::endl;
-    return true;
-}
-
 bool Database::log_event(const SecurityEvent& event) {
-    std::lock_guard<std::mutex> lock(db_mutex_);
     if (!db_) return false;
+    std::lock_guard<std::mutex> lock(db_mutex_);
 
-    std::string sql = "INSERT INTO audit_logs (timestamp, source_ip, threat_level, anomaly_score, description) VALUES (" +
-                      std::to_string(std::chrono::system_clock::to_time_t(event.timestamp)) + ", '" +
-                      event.source_ip + "', '" +
-                      threat_level_to_string(event.level) + "', " +
-                      std::to_string(event.anomaly_score) + ", '" +
+    std::string sql = "INSERT INTO audit_logs (event_id, type, source_ip, anomaly_score, action, description) VALUES (" +
+                      std::to_string(event.event_id) + ", " +
+                      std::to_string(static_cast<int>(event.type)) + ", '" +
+                      event.source_ip + "', " +
+                      std::to_string(event.anomaly_score) + ", " +
+                      std::to_string(static_cast<int>(event.action_taken)) + ", '" +
                       event.description + "');";
 
     char* err_msg = nullptr;
-    int rc = sqlite3_exec(db_, sql.c_str(), 0, 0, &err_msg);
-    if (rc != SQLITE_OK) {
+    if (sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &err_msg) != SQLITE_OK) {
         sqlite3_free(err_msg);
         return false;
     }
