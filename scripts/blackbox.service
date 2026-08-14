@@ -1,0 +1,14 @@
+[Unit]
+Description=Blackbox Autonomous Cyber-Physical Defense Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/local/bin/blackbox
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
