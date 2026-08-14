@@ -1,7 +1,3 @@
-Here is a complete, detailed, and comprehensive `README.md` for **Blackbox**, written professionally without icons or emojis.
-
-***
-
 # Blackbox: Autonomous Air-Gapped Cyber-Physical Security Platform
 
 Blackbox is a high-performance, autonomous security platform designed for high-assurance, air-gapped environments, critical infrastructure, and defense networks. Built in native C++20 and powered by the `xinfer-essential` AI engine (`libxinfer.so`), Blackbox ingests network telemetry, system logs, and camera streams to detect and autonomously block threats in microseconds using Linux kernel eBPF/XDP packet filtering.
