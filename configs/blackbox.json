@@ -1,0 +1,21 @@
+{
+  "system": {
+    "node_id": "blackbox-ubuntu-node-01",
+    "http_port": 8443,
+    "log_level": "info"
+  },
+  "ingestion": {
+    "network_interface": "eth0",
+    "enable_ebpf_xdp": true,
+    "syslog_port": 514
+  },
+  "ai_engine": {
+    "xinfer_target": "TensorRT",
+    "model_path": "models/network_threat_detector.engine",
+    "confidence_threshold": 0.85
+  },
+  "mitigation": {
+    "auto_block_enabled": true,
+    "ebpf_block_duration_seconds": 3600
+  }
+}
