@@ -1,21 +1,24 @@
 {
   "system": {
-    "node_id": "blackbox-ubuntu-node-01",
+    "node_id": "blackbox-edge-01",
+    "log_level": "info",
     "http_port": 8443,
-    "log_level": "info"
+    "websocket_port": 8444
   },
   "ingestion": {
     "network_interface": "eth0",
     "enable_ebpf_xdp": true,
-    "syslog_port": 514
+    "syslog_port": 514,
+    "rtsp_camera_url": "rtsp://127.0.0.1:8554/live"
   },
   "ai_engine": {
     "xinfer_target": "TensorRT",
-    "model_path": "models/network_threat_detector.engine",
-    "confidence_threshold": 0.85
+    "model_path": "models/threat_detector.engine",
+    "anomaly_threshold": 0.85
   },
   "mitigation": {
     "auto_block_enabled": true,
-    "ebpf_block_duration_seconds": 3600
+    "ebpf_block_duration_sec": 3600,
+    "gpio_alarm_pin": 18
   }
 }
