@@ -1,19 +1,25 @@
 #pragma once
 #include "blackbox/event.hpp"
-#include "storage/ring_buffer.hpp"
-#include <string>
+#include <atomic>
+#include <thread>
+#include <functional>
 
 namespace blackbox::ingest {
 
 class LogIngest {
 public:
-    explicit LogIngest(storage::LockFreeRingBuffer<SecurityEvent, 1024>& queue);
-    ~LogIngest() = default;
+    using EventCallback = std::function<void(const SecurityEvent&)>;
 
-    void process_syslog_line(const std::string& line);
+    explicit LogIngest(int syslog_port);
+    ~LogIngest();
+
+    void start(EventCallback callback);
+    void stop();
 
 private:
-    storage::LockFreeRingBuffer<SecurityEvent, 1024>& queue_;
+    int syslog_port_;
+    std::atomic<bool> running_{false};
+    std::thread listener_thread_;
 };
 
 } // namespace blackbox::ingest
