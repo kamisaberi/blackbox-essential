@@ -1,7 +1,6 @@
 #pragma once
-#include <string>
-#include <atomic>
 #include <thread>
+#include <atomic>
 
 namespace blackbox::api {
 
@@ -14,10 +13,7 @@ public:
     void stop();
 
 private:
-    void listen_loop();
-
     int port_;
-    int server_fd_{-1};
     std::atomic<bool> running_{false};
     std::thread server_thread_;
 };
