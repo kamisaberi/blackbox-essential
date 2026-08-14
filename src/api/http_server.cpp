@@ -15,51 +15,42 @@ HTTPServer::~HTTPServer() {
 
 void HTTPServer::start() {
     running_ = true;
-    server_thread_ = std::thread(&HTTPServer::listen_loop, this);
+    server_thread_ = std::thread([this]() {
+        int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (server_fd < 0) return;
+
+        int opt = 1;
+        setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+        sockaddr_in address{};
+        address.sin_family = AF_INET;
+        address.sin_addr.s_addr = INADDR_ANY;
+        address.sin_port = htons(port_);
+
+        if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
+            close(server_fd);
+            return;
+        }
+
+        listen(server_fd, 5);
+        std::cout << "[HTTP Server] Air-Gapped Web Dashboard active on port: " << port_ << std::endl;
+
+        while (running_) {
+            int new_socket = accept(server_fd, nullptr, nullptr);
+            if (new_socket >= 0) {
+                const char* response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{\"status\":\"blackbox_active\"}";
+                send(new_socket, response, strlen(response), 0);
+                close(new_socket);
+            }
+        }
+        close(server_fd);
+    });
 }
 
 void HTTPServer::stop() {
     running_ = false;
-    if (server_fd_ != -1) {
-        close(server_fd_);
-        server_fd_ = -1;
-    }
     if (server_thread_.joinable()) {
         server_thread_.join();
-    }
-}
-
-void HTTPServer::listen_loop() {
-    server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd_ < 0) return;
-
-    int opt = 1;
-    setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
-    sockaddr_in address{};
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(port_);
-
-    if (bind(server_fd_, (struct sockaddr*)&address, sizeof(address)) < 0) return;
-    if (listen(server_fd_, 5) < 0) return;
-
-    std::cout << "[Air-Gapped API] Local Web Dashboard active on https://127.0.0.1:" << port_ << std::endl;
-
-    while (running_) {
-        sockaddr_in client_addr{};
-        socklen_t addrlen = sizeof(client_addr);
-        int client_fd = accept(server_fd_, (struct sockaddr*)&client_addr, &addrlen);
-        if (client_fd < 0) continue;
-
-        std::string response = 
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: application/json\r\n"
-            "Access-Control-Allow-Origin: *\r\n\r\n"
-            "{\"status\":\"active\",\"node\":\"blackbox-airgapped-01\",\"threats_blocked\":42}";
-
-        write(client_fd, response.c_str(), response.size());
-        close(client_fd);
     }
 }
 
