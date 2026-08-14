@@ -1,0 +1,10 @@
+{
+  "rules": [
+    {
+      "rule_id": "RULE-101",
+      "name": "High Anomaly Score Kernel Drop",
+      "anomaly_threshold": 0.85,
+      "action": "EBPF_BLOCK_IP"
+    }
+  ]
+}
