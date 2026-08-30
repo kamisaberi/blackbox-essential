@@ -3,6 +3,8 @@
 #include <xinfer/xinfer.hpp>
 #include <memory>
 #include <string>
+#include "blackbox/export.hpp"  // <--- ADD THIS
+
 
 namespace blackbox::ai {
 

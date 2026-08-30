@@ -4,10 +4,11 @@
 #include <atomic>
 #include <optional>
 #include <cstddef>
+#include "blackbox/export.hpp"  // <--- ADD THIS
 
 namespace blackbox::storage {
 
-class EventRingBuffer {
+class BLACKBOX_API  EventRingBuffer {
 public:
     explicit EventRingBuffer(size_t capacity = 1024);
     ~EventRingBuffer() = default;
