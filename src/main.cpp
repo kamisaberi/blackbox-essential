@@ -29,9 +29,9 @@ int main() {
     std::cout << " Operating System: Ubuntu Linux                           " << std::endl;
     std::cout << "==========================================================" << std::endl;
 
-    // 1. Initialize Subsystems
-    blackbox::storage::LockFreeRingBuffer<blackbox::SecurityEvent, 1024> event_queue;
-    blackbox::ai::AIManager ai_manager(xinfer::Target::TensorRT, "models/threat_detector.engine");
+    // 1. Initialize Subsystems (Use EventRingBuffer & Target::OpenVINO for CPU/VMware)
+    blackbox::storage::EventRingBuffer event_queue(1024);
+    blackbox::ai::AIManager ai_manager(xinfer::Target::OpenVINO, "threat_detector.onnx");
     blackbox::mitigation::EBPFBlocker ebpf_blocker;
     blackbox::correlator::RulesEngine rules_engine(ebpf_blocker);
 
