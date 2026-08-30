@@ -1,6 +1,7 @@
 #pragma once
 #include "blackbox/event.hpp"
 #include "mitigation/ebpf_blocker.hpp"
+#include "blackbox/export.hpp"  // <--- ADD THIS
 
 namespace blackbox::correlator {
 
