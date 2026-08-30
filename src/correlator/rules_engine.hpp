@@ -5,7 +5,7 @@
 
 namespace blackbox::correlator {
 
-class RulesEngine {
+class BLACKBOX_API  RulesEngine {
 public:
     explicit RulesEngine(mitigation::EBPFBlocker& blocker);
     ~RulesEngine() = default;
