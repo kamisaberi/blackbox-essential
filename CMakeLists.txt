@@ -79,8 +79,17 @@ add_executable(blackbox_daemon src/main.cpp)
 target_link_libraries(blackbox_daemon PRIVATE blackbox::blackbox)
 set_target_properties(blackbox_daemon PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
 
+
+if(BLACKBOX_BUILD_TESTS)
+    enable_testing()           # <--- REQUIRED FOR CTEST
+    add_subdirectory(tests)    # <--- INCLUDES TESTS FOLDER
+endif()
+
 # ----------------------------------------------------
 # INSTALLATION RULES
 # ----------------------------------------------------
 install(TARGETS blackbox DESTINATION /usr/local/lib)
 install(DIRECTORY include/blackbox DESTINATION /usr/local/include)
+
+
+
