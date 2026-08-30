@@ -7,7 +7,7 @@
 
 namespace blackbox::mitigation {
 
-class EBPFBlocker {
+class BLACKBOX_API  EBPFBlocker {
 public:
     EBPFBlocker() = default;
     ~EBPFBlocker() = default;
