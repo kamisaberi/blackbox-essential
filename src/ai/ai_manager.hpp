@@ -8,7 +8,7 @@
 
 namespace blackbox::ai {
 
-class AIManager {
+class BLACKBOX_API AIManager {
 public:
     AIManager(xinfer::Target target, const std::string& model_path);
     ~AIManager() = default;
