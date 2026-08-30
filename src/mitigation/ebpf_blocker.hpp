@@ -2,6 +2,8 @@
 #include <string>
 #include <unordered_set>
 #include <mutex>
+#include "blackbox/export.hpp"  // <--- ADD THIS
+
 
 namespace blackbox::mitigation {
 
