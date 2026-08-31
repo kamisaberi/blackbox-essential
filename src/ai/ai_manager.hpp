@@ -36,7 +36,8 @@ inline xinfer::Target string_to_xinfer_target(const std::string& target_str) {
 
 class BLACKBOX_API AIManager {
 public:
-    AIManager(xinfer::Target target, const std::string& model_path);
+    explicit AIManager(xinfer::Target target, const std::string& model_path = "");
+    explicit AIManager(const std::string& target_str, const std::string& model_path = "");
     ~AIManager() = default;
 
     // Evaluates security event features using xInfer Essential Engine
