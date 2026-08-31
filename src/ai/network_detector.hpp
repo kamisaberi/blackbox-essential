@@ -1,4 +1,6 @@
 #pragma once
+
+#include "blackbox/export.hpp"
 #include "blackbox/event.hpp"
 #include <xinfer/xinfer.hpp>
 #include <memory>
@@ -6,12 +8,12 @@
 
 namespace blackbox::ai {
 
-class NetworkDetector {
+class BLACKBOX_API NetworkDetector {
 public:
-    NetworkDetector();
+    explicit NetworkDetector(xinfer::Target target = xinfer::Target::OpenVINO);
+    explicit NetworkDetector(const std::string& target_str);
     ~NetworkDetector() = default;
 
-    // Evaluates network flow telemetry vectors using xInfer Essential
     float analyze_flow(const std::vector<float>& flow_features);
 
 private:
