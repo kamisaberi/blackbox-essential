@@ -43,6 +43,8 @@ public:
     float analyze_event(SecurityEvent& event);
 
 private:
+    xinfer::Target target_;
+
     std::unique_ptr<xinfer::Engine> xinfer_engine_;
     bool is_initialized_{false};
 };
