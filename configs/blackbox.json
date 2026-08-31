@@ -5,20 +5,20 @@
     "http_port": 8443,
     "websocket_port": 8444
   },
+  "ai_engine": {
+    "comment": "Supported target values: TensorRT, OpenVINO, RKNN, VitisAI, QNN, CoreML, RyzenAI, NeuroPilot, Hailo, CVFlow, ENN, EdgeTPU, FPGA_AI, VectorBlox, SensAI",
+    "xinfer_target": "OpenVINO",
+    "network_model_path": "models/threat_detector.onnx",
+    "vision_model_path": "models/perimeter_yolo.onnx",
+    "anomaly_threshold": 0.85
+  },
   "ingestion": {
     "network_interface": "eth0",
     "enable_ebpf_xdp": true,
-    "syslog_port": 514,
-    "rtsp_camera_url": "rtsp://127.0.0.1:8554/live"
-  },
-  "ai_engine": {
-    "xinfer_target": "TensorRT",
-    "model_path": "models/threat_detector.engine",
-    "anomaly_threshold": 0.85
+    "syslog_port": 514
   },
   "mitigation": {
     "auto_block_enabled": true,
-    "ebpf_block_duration_sec": 3600,
-    "gpio_alarm_pin": 18
+    "ebpf_block_duration_sec": 3600
   }
 }
