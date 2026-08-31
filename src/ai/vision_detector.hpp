@@ -1,4 +1,6 @@
 #pragma once
+
+#include "blackbox/export.hpp"
 #include "blackbox/event.hpp"
 #include <xinfer/xinfer.hpp>
 #include <memory>
@@ -6,12 +8,12 @@
 
 namespace blackbox::ai {
 
-class VisionDetector {
+class BLACKBOX_API VisionDetector {
 public:
-    VisionDetector();
+    explicit VisionDetector(xinfer::Target target = xinfer::Target::OpenVINO);
+    explicit VisionDetector(const std::string& target_str);
     ~VisionDetector() = default;
 
-    // Evaluates camera frame bounding box features using xInfer Essential
     float analyze_frame(const std::vector<float>& frame_features);
 
 private:
