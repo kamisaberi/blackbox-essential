@@ -8,6 +8,32 @@
 
 namespace blackbox::ai {
 
+
+
+    // Helper: Converts string from blackbox.json into xinfer::Target enum
+inline xinfer::Target string_to_xinfer_target(const std::string& target_str) {
+    if (target_str == "TensorRT")   return xinfer::Target::TensorRT;
+    if (target_str == "OpenVINO")   return xinfer::Target::OpenVINO;
+    if (target_str == "RKNN")       return xinfer::Target::RKNN;
+    if (target_str == "VitisAI")    return xinfer::Target::VitisAI;
+    if (target_str == "QNN")        return xinfer::Target::QNN;
+    if (target_str == "CoreML")     return xinfer::Target::CoreML;
+    if (target_str == "RyzenAI")    return xinfer::Target::RyzenAI;
+    if (target_str == "NeuroPilot") return xinfer::Target::NeuroPilot;
+    if (target_str == "Hailo")      return xinfer::Target::Hailo;
+    if (target_str == "CVFlow")     return xinfer::Target::CVFlow;
+    if (target_str == "ENN")        return xinfer::Target::ENN;
+    if (target_str == "EdgeTPU")    return xinfer::Target::EdgeTPU;
+    if (target_str == "FPGA_AI")    return xinfer::Target::FPGA_AI;
+    if (target_str == "VectorBlox") return xinfer::Target::VectorBlox;
+    if (target_str == "SensAI")     return xinfer::Target::SensAI;
+
+    // Default fallback
+    return xinfer::Target::OpenVINO;
+}
+
+
+
 class BLACKBOX_API AIManager {
 public:
     AIManager(xinfer::Target target, const std::string& model_path);
