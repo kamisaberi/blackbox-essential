@@ -1,18 +1,23 @@
 #include "vision_detector.hpp"
+#include "ai_manager.hpp"
 #include <iostream>
 
 namespace blackbox::ai {
 
-VisionDetector::VisionDetector() {
+VisionDetector::VisionDetector(xinfer::Target target) {
     try {
-        xinfer_engine_ = std::make_unique<xinfer::Engine>(xinfer::Target::TensorRT);
+        xinfer_engine_ = std::make_unique<xinfer::Engine>(target);
         is_ready_ = true;
-        std::cout << "[Vision Detector AI] Connected to xInfer Essential Engine." << std::endl;
+        std::cout << "[Vision Detector AI] Connected to xInfer Engine (" 
+                  << xinfer::target_to_string(target) << ")." << std::endl;
     } catch (const std::exception& e) {
-        std::cerr << "[Vision Detector AI] Fallback mode active: " << e.what() << std::endl;
+        std::cerr << "[Vision Detector AI Warning] Engine fallback active: " << e.what() << std::endl;
         is_ready_ = false;
     }
 }
+
+VisionDetector::VisionDetector(const std::string& target_str)
+    : VisionDetector(string_to_xinfer_target(target_str)) {}
 
 float VisionDetector::analyze_frame(const std::vector<float>& frame_features) {
     if (!is_ready_ || frame_features.empty()) {
