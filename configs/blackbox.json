@@ -1,0 +1,21 @@
+{
+  "system": {
+    "node_id": "blackbox-node-01",
+    "http_port": 8443
+  },
+  "ai_engine": {
+    "xinfer_target": "OpenVINO",
+    "model_path": "models/version-RFB-320.onnx",
+    "input_tensor_name": "input",
+    "output_tensor_name": "scores",
+    "anomaly_threshold": 0.85
+  },
+  "ingestion": {
+    "network_interface": "eth0",
+    "enable_ebpf_xdp": true
+  },
+  "mitigation": {
+    "auto_block_enabled": true,
+    "ebpf_block_duration_sec": 3600
+  }
+}
