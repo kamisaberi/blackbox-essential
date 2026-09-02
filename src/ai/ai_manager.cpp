@@ -7,6 +7,18 @@ AIManager::AIManager(const ModelConfig& config) {
     initialize(config);
 }
 
+AIManager::AIManager(xinfer::Target target, 
+                     const std::string& model_path, 
+                     const std::string& input_tensor_name, 
+                     const std::string& output_tensor_name) {
+    ModelConfig cfg;
+    cfg.target = target;
+    cfg.model_path = model_path;
+    cfg.input_tensor_name = input_tensor_name;
+    cfg.output_tensor_name = output_tensor_name;
+    initialize(cfg);
+}
+
 bool AIManager::initialize(const ModelConfig& config) {
     config_ = config;
     try {
@@ -49,7 +61,7 @@ float AIManager::analyze_event(SecurityEvent& event) {
         xinfer::Tensor& output = xinfer_engine_->get_output_tensor(config_.output_tensor_name);
         return output.data<float>()[0];
 
-    } catch (const std::exception& e) {
+    } catch (...) {
         return event.anomaly_score;
     }
 }
