@@ -5,8 +5,6 @@
 #include "mitigation/ebpf_blocker.hpp"
 #include "storage/ring_buffer.hpp"
 #include "storage/database.hpp"
-#include "ingest/network_ingest.hpp"
-#include "ingest/log_ingest.hpp"
 
 #include <iostream>
 #include <thread>
@@ -20,7 +18,7 @@ public:
         : db_("blackbox_audit.db"),
           ebpf_blocker_(),
           rules_engine_(ebpf_blocker_),
-          ai_manager_(xinfer::Target::TensorRT, "models/threat_detector.engine") {
+          ai_manager_(xinfer::Target::OpenVINO, "version-RFB-320.onnx", "input", "scores") {
         std::cout << "[libblackbox.so] Initialized Blackbox Engine Instance (" << config_path << ")" << std::endl;
     }
 
@@ -28,20 +26,13 @@ public:
         if (running_) return true;
         running_ = true;
 
-        // Start Background Worker Thread
         worker_thread_ = std::thread([this]() {
             while (running_) {
                 auto event_opt = ring_buffer_.pop();
                 if (event_opt.has_value()) {
                     auto event = event_opt.value();
-                    
-                    // Run xInfer Engine AI Inference
                     event.anomaly_score = ai_manager_.analyze_event(event);
-                    
-                    // Run Rules Correlation & Autonomous Mitigation
                     rules_engine_.process_event(event);
-                    
-                    // Log to Encrypted SQLite Audit DB
                     db_.log_event(event);
                 } else {
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
@@ -87,7 +78,6 @@ private:
     ai::AIManager ai_manager_;
 };
 
-// Pimpl Wrapper Delegations
 BlackboxEngine::BlackboxEngine(const std::string& config_file_path)
     : impl_(std::make_unique<Impl>(config_file_path)) {}
 
