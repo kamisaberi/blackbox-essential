@@ -10,6 +10,15 @@ namespace blackbox::ai {
 
 
 
+    // Fully dynamic model configuration struct
+struct BLACKBOX_API ModelConfig {
+    xinfer::Target target{xinfer::Target::OpenVINO};
+    std::string model_path;
+    std::string input_tensor_name{"input"};   // Dynamic input tensor name
+    std::string output_tensor_name{"scores"}; // Dynamic output tensor name
+    float anomaly_threshold{0.85f};
+};
+
     // Helper: Converts string from blackbox.json into xinfer::Target enum
 inline xinfer::Target string_to_xinfer_target(const std::string& target_str) {
     if (target_str == "TensorRT")   return xinfer::Target::TensorRT;
