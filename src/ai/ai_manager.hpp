@@ -46,13 +46,19 @@ inline xinfer::Target string_to_xinfer_target(const std::string& target_str) {
 class BLACKBOX_API AIManager {
 public:
     AIManager() = default;
+    
+    // Primary Constructor via ModelConfig
     explicit AIManager(const ModelConfig& config);
+
+    // Overloaded Convenience Constructor (Target + Path + Tensor Names)
+    AIManager(xinfer::Target target, 
+              const std::string& model_path = "", 
+              const std::string& input_tensor_name = "input", 
+              const std::string& output_tensor_name = "scores");
+
     ~AIManager() = default;
 
-    // Initializes the engine with dynamic tensor mappings
     bool initialize(const ModelConfig& config);
-
-    // Evaluates event features dynamically
     float analyze_event(SecurityEvent& event);
 
     const ModelConfig& get_config() const { return config_; }
@@ -62,6 +68,5 @@ private:
     std::unique_ptr<xinfer::Engine> xinfer_engine_;
     bool is_initialized_{false};
 };
-
 
 } // namespace blackbox::ai
