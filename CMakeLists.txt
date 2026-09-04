@@ -75,6 +75,10 @@ target_link_libraries(blackbox PRIVATE
     Threads::Threads
     ${XINFER_LIB}
     ${SQLITE3_LIB}
+    ${BPF_LIB}
+    ${ELF_LIB}
+    OpenSSL::Crypto    # <--- ADD THIS
+
 )
 
 # ----------------------------------------------------
