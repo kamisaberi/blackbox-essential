@@ -71,12 +71,13 @@ set_target_properties(blackbox PROPERTIES
 
 # Link Dependencies to Shared Library
 target_link_libraries(blackbox PRIVATE
+    bpf
+    elf
+    z
     Threads::Threads
     ${XINFER_LIB}
     ${SQLITE3_LIB}
-    ${BPF_LIB}
-    ${ELF_LIB}
-    OpenSSL::Crypto    # <--- ADD THIS
+    OpenSSL::Crypto
 
 )
 
