@@ -48,6 +48,8 @@ set(LIBBLACKBOX_SOURCES
     src/ingest/vision_ingest.cpp
     src/api/http_server.cpp
     src/api/websocket.cpp
+    src/hardware/hardware_identity.cpp   # <--- ADD THIS
+
 )
 
 # ----------------------------------------------------
