@@ -5,35 +5,30 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Enforce symbol visibility presets for Shared Library
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
-# RPATH configuration so binaries find libblackbox.so & libxinfer.so
+# RPATH configuration
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH "/usr/local/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# Compiler Options
-add_compile_options(-O3 -Wall -Wextra -pthread -march=native)
+# Options
+option(BLACKBOX_BUILD_TESTS "Build unit tests and benchmarks" ON)
 
-# Include Directories
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     /usr/local/include
 )
 
-# Find System Dependencies
+# System & External Dependencies
 find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_library(XINFER_LIB xinfer REQUIRED PATHS /usr/local/lib /usr/lib)
 find_library(SQLITE3_LIB sqlite3 REQUIRED)
 
-
-
-# Core Sources for Shared Library
 set(LIBBLACKBOX_SOURCES
     src/engine_instance.cpp
     src/hardware/hardware_identity.cpp
@@ -54,23 +49,15 @@ set(LIBBLACKBOX_SOURCES
     src/api/websocket.cpp
 )
 
-# ----------------------------------------------------
+# -------------------------------------------------------------------
 # BUILD SHARED LIBRARY (libblackbox.so)
-# ----------------------------------------------------
+# -------------------------------------------------------------------
 add_library(blackbox SHARED ${LIBBLACKBOX_SOURCES})
 add_library(blackbox::blackbox ALIAS blackbox)
-
-# Define BLACKBOX_EXPORTS when building the library
 target_compile_definitions(blackbox PRIVATE BLACKBOX_EXPORTS)
 
-set_target_properties(blackbox PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    SOVERSION 1
-    OUTPUT_NAME "blackbox"
-)
-
-# Link Dependencies to Shared Library
-target_link_libraries(blackbox PRIVATE
+# Link bpf, elf, z directly as PUBLIC so dependencies propagate cleanly
+target_link_libraries(blackbox PUBLIC
     bpf
     elf
     z
@@ -78,27 +65,29 @@ target_link_libraries(blackbox PRIVATE
     ${XINFER_LIB}
     ${SQLITE3_LIB}
     OpenSSL::Crypto
-
 )
 
-# ----------------------------------------------------
-# DEMO DAEMON EXECUTABLE (Links against libblackbox.so)
-# ----------------------------------------------------
-add_executable(blackbox_daemon src/main.cpp)
-target_link_libraries(blackbox_daemon PRIVATE blackbox::blackbox)
-set_target_properties(blackbox_daemon PROPERTIES BUILD_WITH_INSTALL_RPATH TRUE)
+set_target_properties(blackbox PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION 1
+    OUTPUT_NAME "blackbox"
+)
 
+# -------------------------------------------------------------------
+# DEMO DAEMON
+# -------------------------------------------------------------------
+add_executable(blackbox_daemon src/main.cpp)
+target_link_libraries(blackbox_daemon PRIVATE 
+    blackbox::blackbox 
+    bpf 
+    elf
+)
 
 if(BLACKBOX_BUILD_TESTS)
-    enable_testing()           # <--- REQUIRED FOR CTEST
-    add_subdirectory(tests)    # <--- INCLUDES TESTS FOLDER
+    enable_testing()
+    add_subdirectory(tests)
 endif()
 
-# ----------------------------------------------------
-# INSTALLATION RULES
-# ----------------------------------------------------
+# Installation Rules
 install(TARGETS blackbox DESTINATION /usr/local/lib)
 install(DIRECTORY include/blackbox DESTINATION /usr/local/include)
-
-
-
