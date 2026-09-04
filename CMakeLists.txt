@@ -30,6 +30,9 @@ find_package(Threads REQUIRED)
 find_library(XINFER_LIB xinfer REQUIRED PATHS /usr/local/lib /usr/lib)
 find_library(SQLITE3_LIB sqlite3 REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
+
 # Core Sources for Shared Library
 set(LIBBLACKBOX_SOURCES
     src/engine_instance.cpp
