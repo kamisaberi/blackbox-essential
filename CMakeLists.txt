@@ -36,6 +36,7 @@ find_library(SQLITE3_LIB sqlite3 REQUIRED)
 # Core Sources for Shared Library
 set(LIBBLACKBOX_SOURCES
     src/engine_instance.cpp
+    src/hardware/hardware_identity.cpp
     src/ai/ai_manager.cpp
     src/ai/network_detector.cpp
     src/ai/vision_detector.cpp
@@ -51,8 +52,6 @@ set(LIBBLACKBOX_SOURCES
     src/ingest/vision_ingest.cpp
     src/api/http_server.cpp
     src/api/websocket.cpp
-    src/hardware/hardware_identity.cpp   # <--- ADD THIS
-
 )
 
 # ----------------------------------------------------
