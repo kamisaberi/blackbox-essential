@@ -48,3 +48,160 @@ This expanded catalog creates a clear path to commercialize your technology acro
 ### Commercial Execution Recommendation
 1. **Appliance Products (Sell Today):** **Blackbox Sentinel** (Tier 1 core) combined with the **Line-Rate ETA Fingerprinter** and **SCADA PLC Edge Validator**.
 2. **Endpoint Sensor Add-Ons (Sell Next):** Build the **eBPF Syscall Anomaly Guard** and **Ransomware IOPS Interceptor** as standalone C++ binary agents that stream security event vectors back to Sentinel.
+
+
+
+---
+---
+---
+# DESCRIPTION
+
+To understand how **Blackbox Sentinel** connects to other applications, think of it in terms of **Network Directions**: 
+
+1. **Southbound (Incoming):** How external devices and remote software send data *into* Sentinel.
+2. **East-West (Inline / Sensor Mesh):** How Sentinel sits directly in the traffic flow or talks to local software on the same machine.
+3. **Northbound (Outgoing):** How Sentinel talks to external systems (Splunk, Firewalls, Webhooks, PagerDuty).
+
+---
+
+### The Master Connection Architecture
+
+```text
+                                [ NORTHBOUND: Corporate SOC & Cloud ]
+                                  - Splunk / QRadar (CEF over TLS)
+                                  - Perimeter Firewalls (Palo Alto / Fortinet API)
+                                  - Webhooks (Slack / PagerDuty)
+                                                ^
+                                                | (JSON / Alerts)
++---------------------------------------------------------------------------------------------------+
+| BLACKBOX SENTINEL APPLIANCE (Central Engine)                                                      |
+|                                                                                                   |
+|  [ Ingestion Listeners ]             [ Core Security Bus ]           [ AI & Kernel Enforcement ]  |
+|  - TCP Port 9000 (Binary/gRPC) --->  Lock-Free Ring Buffer  ------>  xInfer AI (< 1ms)            |
+|  - UDP Port 514 (Syslog)                                             eBPF / XDP Kernel Dropper    |
+|  - Port 554 (RTSP Video)                                             SQLite Local Audit DB        |
+|  - Unix Socket (/var/run/sentinel.sock)                                                           |
++---------------------------------------------------------------------------------------------------+
+        ^                                       ^                                       ^
+        | (mTLS / gRPC)                         | (Syslog / Raw Packets)                | (Direct C++ Linking)
+        |                                       |                                       |
+ [ SENSOR AGENTS ]                       [ UNMANAGED HARDWARE ]                  [ LOCAL APPLICATIONS ]
+ Remote Linux/K8s Servers                Network Switches & Cameras              Same Physical Server
+ - eBPF Syscall Sensor                   - Cisco / Juniper (NetFlow)             - Industrial Robot App
+ - Ransomware IOPS Agent                 - IP Cameras (RTSP H.264)               - NGINX Web Server
+ - SCADA PLC Sensor                      - Windows Server (Event Logs)           - Custom C++ App
+```
+
+---
+
+### The 4 Connection Models (How It Works in Code)
+
+Depending on where the other application lives, Sentinel connects in one of four distinct ways:
+
+---
+
+#### Model 1: Distributed C++ Sensor Agents (Remote Servers $\rightarrow$ Sentinel)
+
+* **Where it runs:** You deploy a tiny, 5MB C++ sensor binary (`sentinel-agent`) on remote client servers, Docker containers, or Kubernetes pods.
+* **The Wire Protocol:** High-speed binary over TCP (using Protocol Buffers or mTLS).
+* **How it works:**
+  1. The agent captures local system calls or file-system events on the remote server.
+  2. The agent packages the event into a binary struct and sends it over a persistent TCP connection to Sentinel on port `9000`.
+  3. Sentinel ingests it, runs `libxinfer.so` to score it, and responds with a mitigation instruction (e.g., `KILL_PID` or `ISOLATE_INTERFACE`).
+
+```text
+[ Remote Client Server ]                                         [ Blackbox Sentinel Appliance ]
+`sentinel-agent` (5MB binary)                                    `sentinel` daemon (Listening on 9000)
+  Capture syscall/log ---> [TCP / mTLS Packet] ----------------> Ingest buffer -> xInfer AI
+```
+
+**C++ Agent Code (Remote Client Side):**
+```cpp
+// Remote agent sends a lightweight event over TCP
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+void send_event_to_sentinel(const char* payload, size_t len) {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in serv_addr{};
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(9000);
+    inet_pton(AF_INET, "192.168.1.100", &serv_addr.sin_addr); // Sentinel IP
+
+    connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+    send(sock, payload, len, 0);
+    close(sock);
+}
+```
+
+---
+
+#### Model 2: Standard Agentless Ingestion (Switches, Cameras, Windows)
+
+* **Where it runs:** Devices where you **cannot** install custom software (like a Cisco switch, an industrial PLC, an RTSP camera, or a locked Windows Server).
+* **How it connects:** Sentinel exposes standard listeners that accept native protocols:
+  * **Syslog Listener (`UDP 514`):** Any Linux/Windows machine configures `rsyslog` or `NXLog` to send text logs to Sentinel's IP.
+  * **NetFlow / IPFIX (`UDP 2055`):** Routers stream network traffic flow statistics to Sentinel.
+  * **RTSP Client (`TCP 554`):** Sentinel connects to external camera feeds and pulls H.264 video streams for facial/perimeter analysis via `libxinfer.so`.
+
+---
+
+#### Model 3: Local Inter-Process Connection (Applications on the SAME Server)
+
+* **Where it runs:** Other software running on the **same physical hardware** as Sentinel (e.g., a local industrial control app or an NGINX proxy).
+* **How it connects:** It avoids network overhead entirely using two high-performance mechanisms:
+
+##### A. Direct Library Linking (Zero Overhead)
+The other application links against `libblackbox.so` directly:
+```cpp
+#include <blackbox/blackbox.hpp>
+
+int main() {
+    // Other application uses Blackbox directly in-process
+    blackbox::BlackboxEngine engine("configs/sentinel_config.json");
+    engine.start();
+
+    blackbox::SecurityEvent event;
+    event.source_ip = "10.0.0.5";
+    engine.submit_event(event);
+}
+```
+
+##### B. Unix Domain Sockets (`/var/run/sentinel.sock`)
+If the other application is written in Python, Go, or Rust, it communicates with Sentinel locally through a high-speed Unix Domain Socket with **zero TCP network latency**:
+```text
+[ Local Python/Go App ] ---> Writes to `/var/run/sentinel.sock` ---> [ Sentinel C++ Core ]
+```
+
+---
+
+#### Model 4: Upstream SOC & Perimeter Integration (Northbound API)
+
+* **Where it runs:** External corporate tools that want alerts *from* Sentinel.
+* **How it connects:** 
+  1. **Outbound REST Webhooks:** When Sentinel's eBPF engine drops an IP, it sends an HTTP POST JSON payload to:
+     * **Perimeter Firewalls (Palo Alto / Fortinet):** Tells the main firewall to permanently block the IP at the edge.
+     * **Incident Response (Slack / PagerDuty / Microsoft Teams):** Notifies security on-call engineers.
+  2. **Upstream SIEM Forwarder:** Sentinel streams formatted CEF (Common Event Format) logs to central Splunk or QRadar clusters.
+
+```text
+[ Blackbox Sentinel ] --- eBPF Drops IP Locally (< 1ms)
+         |
+         +---> HTTP POST /api/block-ip --------> [ Palo Alto Perimeter Firewall ]
+         +---> HTTP POST Webhook -------------> [ Corporate Slack / PagerDuty ]
+         +---> Encrypted Syslog (CEF) ---------> [ Central Splunk Dashboard ]
+```
+
+---
+
+### Summary Checklist: How to Plug Sentinel into Any Network
+
+| Target Application | Connection Method | Network Protocol | Data Format |
+| :--- | :--- | :--- | :--- |
+| **Remote Linux Server / Pod** | Custom Lightweight Agent | TCP Port 9000 (mTLS) | Binary / Protocol Buffers |
+| **Corporate Routers / Switches** | Agentless Network Telemetry | UDP Port 2055 | NetFlow v9 / IPFIX |
+| **Windows Active Directory** | Native Forwarder (NXLog / Winlogbeat)| TCP Port 514 (Syslog) | JSON / Syslog text |
+| **Security Cameras** | Native Stream Pull | TCP Port 554 / 8554 | RTSP (H.264 video frames) |
+| **Same-Box Software (C++)** | In-Process Shared Library | Memory / Pointer passing | Direct C++ structs |
+| **Same-Box Software (Python/Go)** | Local IPC | Unix Domain Socket | `/var/run/sentinel.sock` |
+| **Upstream Firewalls & Slack** | Outbound API Integration | HTTPS Port 443 | REST Webhooks (JSON) |
