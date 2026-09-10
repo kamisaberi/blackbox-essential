@@ -78,6 +78,8 @@ private:
     mitigation::EBPFBlocker ebpf_blocker_;
     correlator::RulesEngine rules_engine_;
     ai::AIManager ai_manager_;
+    std::deque<SecurityEvent> recent_threats_; // Real-time live threat memory
+
 };
 
 BlackboxEngine::BlackboxEngine(const std::string& config_file_path)
