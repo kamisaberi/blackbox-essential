@@ -25,6 +25,9 @@ public:
 
     bool is_running() const;
 
+    std::vector<SecurityEvent> get_recent_threats(size_t limit = 50);
+
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl_;
