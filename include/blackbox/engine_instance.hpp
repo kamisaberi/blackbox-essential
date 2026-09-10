@@ -4,6 +4,7 @@
 #include "types.hpp"
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace blackbox {
 
