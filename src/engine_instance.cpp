@@ -33,9 +33,24 @@ public:
                 auto event_opt = ring_buffer_.pop();
                 if (event_opt.has_value()) {
                     auto event = event_opt.value();
+                    
+                    // 1. Run live AI inference via libxinfer.so
                     event.anomaly_score = ai_manager_.analyze_event(event);
+                    
+                    // 2. Correlate and execute eBPF kernel drop
                     rules_engine_.process_event(event);
+                    
+                    // 3. Log to persistent database
                     db_.log_event(event);
+
+                    // 4. PUSH TO LIVE THREAT QUEUE IN MEMORY (For Web App)
+                    {
+                        std::lock_guard<std::mutex> lock(threat_mutex_);
+                        recent_threats_.push_front(event);
+                        if (recent_threats_.size() > 100) {
+                            recent_threats_.pop_back(); // Keep last 100 real events
+                        }
+                    }
                 } else {
                     std::this_thread::sleep_for(std::chrono::microseconds(100));
                 }
@@ -69,6 +84,15 @@ public:
 
     bool is_running() const { return running_; }
 
+    std::vector<SecurityEvent> get_recent_threats(size_t limit) {
+        std::lock_guard<std::mutex> lock(threat_mutex_);
+        std::vector<SecurityEvent> result;
+        for (size_t i = 0; i < limit && i < recent_threats_.size(); ++i) {
+            result.push_back(recent_threats_[i]);
+        }
+        return result;
+    }
+
 private:
     std::atomic<bool> running_{false};
     std::thread worker_thread_;
@@ -78,8 +102,9 @@ private:
     mitigation::EBPFBlocker ebpf_blocker_;
     correlator::RulesEngine rules_engine_;
     ai::AIManager ai_manager_;
-    std::deque<SecurityEvent> recent_threats_; // Real-time live threat memory
 
+    std::mutex threat_mutex_;
+    std::deque<SecurityEvent> recent_threats_; // Real-time live threat memory
 };
 
 BlackboxEngine::BlackboxEngine(const std::string& config_file_path)
@@ -96,6 +121,5 @@ bool BlackboxEngine::is_running() const { return impl_->is_running(); }
 std::vector<SecurityEvent> BlackboxEngine::get_recent_threats(size_t limit) { 
     return impl_->get_recent_threats(limit); 
 }
-
 
 } // namespace blackbox
