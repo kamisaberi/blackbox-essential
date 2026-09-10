@@ -91,5 +91,9 @@ void BlackboxEngine::submit_event(const SecurityEvent& event) { impl_->submit_ev
 bool BlackboxEngine::block_ip_address(const std::string& ip) { return impl_->block_ip(ip); }
 bool BlackboxEngine::unblock_ip_address(const std::string& ip) { return impl_->unblock_ip(ip); }
 bool BlackboxEngine::is_running() const { return impl_->is_running(); }
+std::vector<SecurityEvent> BlackboxEngine::get_recent_threats(size_t limit) { 
+    return impl_->get_recent_threats(limit); 
+}
+
 
 } // namespace blackbox
