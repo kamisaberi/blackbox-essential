@@ -37,4 +37,16 @@ inline std::string threat_level_to_string(ThreatLevel level) {
     }
 }
 
+inline std::string action_type_to_string(ActionType action) {
+    switch (action) {
+        case ActionType::None:         return "None";
+        case ActionType::LogOnly:      return "Log Only";
+        case ActionType::EBPFBlockIP:  return "eBPF Kernel Drop";
+        case ActionType::KillProcess:  return "Process Terminated";
+        case ActionType::TriggerAlarm: return "Hardware Alarm Triggered";
+        default:                       return "Unknown";
+    }
+}
+
+
 } // namespace blackbox
