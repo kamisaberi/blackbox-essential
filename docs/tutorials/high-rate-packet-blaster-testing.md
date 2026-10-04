@@ -152,28 +152,3 @@ Per-Event Latency      : 684.2 ns
 ```
 ```
 
----
-
-### Complete in Part 9
-- `blackbox-essential/docs/tutorials/building-in-kernel-firewall.md`
-- `blackbox-essential/docs/tutorials/attaching-xdp-to-vmware-vnic.md`
-- `blackbox-essential/docs/tutorials/extracting-tpm2-quotes.md`
-- `blackbox-essential/docs/tutorials/wiring-xdp-to-xinfer.md`
-- `blackbox-essential/docs/tutorials/high-rate-packet-blaster-testing.md`
-
-All 5 practical tutorials for `blackbox-essential` are now generated.
-
----
-
-### Files to be Generated in Part 10
-
-The next phase covers **Benchmarking & Performance Profiling** (`benchmarking/`):
-
-1. `benchmarking/methodology.md` (Microsecond-level timer standards and testbed hardware specs)
-2. `benchmarking/latency-percentiles.md` (Empirical p50, p90, p95, p99, and p99.9 latency distributions)
-3. `benchmarking/xdp-vs-iptables-nftables.md` (Comparative analysis: eBPF/XDP vs. Linux Netfilter)
-4. `benchmarking/xdp-vs-suricata-nfqueue.md` (Comparative analysis: Driver-level XDP vs. userspace NFQUEUE)
-5. `benchmarking/cpu-cycle-profiling.md` (Measuring CPU cycles per packet drop: $< 120$ cycles)
-6. `benchmarking/memory-saturation-benchmarks.md` (Measuring ring buffer stability under line-rate saturation)
-
-Confirm when you are ready to proceed with Part 10.
