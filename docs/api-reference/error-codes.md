@@ -84,30 +84,3 @@ int main() {
 ```
 ```
 
----
-
-### Complete in Part 8
-- `blackbox-essential/docs/api-reference/index.md`
-- `blackbox-essential/docs/api-reference/xdp-manager.md`
-- `blackbox-essential/docs/api-reference/event-ring-buffer.md`
-- `blackbox-essential/docs/api-reference/hardware-identity.md`
-- `blackbox-essential/docs/api-reference/model-config.md`
-- `blackbox-essential/docs/api-reference/kernel-telemetry.md`
-- `blackbox-essential/docs/api-reference/data-structures.md`
-- `blackbox-essential/docs/api-reference/error-codes.md`
-
-All 8 API reference files for `blackbox-essential` are now generated.
-
----
-
-### Files to be Generated in Part 9
-
-The next phase covers **Step-by-Step Practical Tutorials** (`tutorials/`):
-
-1. `tutorials/building-in-kernel-firewall.md` (Creating a wire-speed packet blocker in 50 lines of C++20)
-2. `tutorials/attaching-xdp-to-vmware-vnic.md` (Configuring eBPF on VMware ens33 / vmxnet3 virtual interfaces)
-3. `tutorials/extracting-tpm2-quotes.md` (Reading and verifying physical TPM 2.0 silicon quotes)
-4. `tutorials/wiring-xdp-to-xinfer.md` (Connecting eBPF packet capture to xInfer neural scoring)
-5. `tutorials/high-rate-packet-blaster-testing.md` (Stress-testing the SPMC ring buffer with 1M+ packets/sec)
-
-Confirm when you are ready to proceed with Part 9.
