@@ -1,109 +1,146 @@
-site_name: Blackbox Essential Docs
-site_description: Sub-microsecond eBPF/XDP active defense and TPM 2.0 silicon trust.
-repo_url: https://github.com/kamisaberi/blackbox
+site_name: Blackbox Essential Documentation
+site_description: In-Kernel Linux eBPF/XDP Active Defense Engine, SPMC Lock-Free Concurrency, and TPM 2.0 Hardware Root of Trust
+site_author: Aryorithm Technologies B.V.
+site_url: https://docs.aryorithm.com/blackbox/
+repo_name: kamisaberi/blackbox-essential
+repo_url: https://github.com/kamisaberi/blackbox-essential
+
 theme:
   name: material
+  language: en
+  palette:
+    - scheme: slate
+      primary: red
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - scheme: default
+      primary: red
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
   features:
+    - navigation.instant
+    - navigation.tracking
     - navigation.tabs
     - navigation.sections
+    - navigation.expand
+    - navigation.top
     - search.suggest
+    - search.highlight
     - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+
 markdown_extensions:
   - admonition
-  - codehilite
-  - toc:
-      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - tables
+  - attr_list
+  - md_in_html
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
 nav:
   - Home: index.md
   - Getting Started:
-    - "CMake Integration": getting-started/cmake-integration.md
-    - "Getting Started": getting-started/index.md
-    - "Installation": getting-started/installation.md
-    - "Overview": getting-started/overview.md
-    - "Quickstart Drop Test": getting-started/quickstart-drop-test.md
-    - "System Requirements": getting-started/system-requirements.md
-    - "Verifying Kernel Support": getting-started/verifying-kernel-support.md
+      - Mission & Overview: getting-started/overview.md
+      - System Requirements: getting-started/system-requirements.md
+      - Installation: getting-started/installation.md
+      - CMake Integration: getting-started/cmake-integration.md
+      - Quickstart Drop Test: getting-started/quickstart-drop-test.md
+      - Verifying Kernel Support: getting-started/verifying-kernel-support.md
   - Architecture:
-    - "Core Engine Design": architecture/core-engine-design.md
-    - "Data Plane vs. Control Plane": architecture/data-plane-vs-control-plane.md
-    - "Architecture": architecture/index.md
-    - "Kernel–Userspace ABI": architecture/kernel-userspace-abi.md
-    - "Sub-Microsecond Physics": architecture/sub-microsecond-physics.md
-    - "Zero sk_buff Allocation": architecture/zero-skb-allocation.md
+      - Core Engine Design: architecture/core-engine-design.md
+      - Sub-Microsecond Physics: architecture/sub-microsecond-physics.md
+      - Zero-SKB Allocation: architecture/zero-skb-allocation.md
+      - Data Plane vs Control Plane: architecture/data-plane-vs-control-plane.md
+      - Kernel-Userspace ABI: architecture/kernel-userspace-abi.md
   - eBPF/XDP Subsystem:
-    - "BPF Map Management": ebpf-xdp-subsystem/bpf-map-management.md
-    - "BPF Verifier Guarantees": ebpf-xdp-subsystem/bpf-verifier-guarantees.md
-    - "Compiling BPF Bytecode": ebpf-xdp-subsystem/compiling-bpf-bytecode.md
-    - "Driver Mode vs. SKB Mode": ebpf-xdp-subsystem/driver-mode-vs-skb-mode.md
-    - "eBPF/XDP Subsystem": ebpf-xdp-subsystem/index.md
-    - "Kernel Lockdown & Signing": ebpf-xdp-subsystem/kernel-lockdown-and-signing.md
-    - "TTL Ephemeral Expiry": ebpf-xdp-subsystem/ttl-ephemeral-expiry.md
-    - "XDP Filter Architecture": ebpf-xdp-subsystem/xdp-filter-architecture.md
+      - XDP Filter Architecture: ebpf-xdp-subsystem/xdp-filter-architecture.md
+      - Driver Mode vs SKB Mode: ebpf-xdp-subsystem/driver-mode-vs-skb-mode.md
+      - BPF Verifier Guarantees: ebpf-xdp-subsystem/bpf-verifier-guarantees.md
+      - Compiling BPF Bytecode: ebpf-xdp-subsystem/compiling-bpf-bytecode.md
+      - BPF Map Management: ebpf-xdp-subsystem/bpf-map-management.md
+      - Ephemeral Nanosecond TTL: ebpf-xdp-subsystem/ttl-ephemeral-expiry.md
+      - Kernel Lockdown & Signing: ebpf-xdp-subsystem/kernel-lockdown-and-signing.md
   - SPMC Ring Buffer:
-    - "Atomic Memory Ordering": spmc-ring-buffer/atomic-memory-ordering.md
-    - "Cache-Line Padding": spmc-ring-buffer/cache-line-padding.md
-    - "SPMC Ring Buffer": spmc-ring-buffer/index.md
-    - "Lock-Free SPMC Architecture": spmc-ring-buffer/lock-free-architecture.md
-    - "Multi-Consumer Scaling": spmc-ring-buffer/multi-consumer-scaling.md
-    - "Saturation & Backpressure": spmc-ring-buffer/saturation-and-backpressure.md
-    - "Zero-Mutex Producer": spmc-ring-buffer/zero-mutex-producer.md
+      - Lock-Free Architecture: spmc-ring-buffer/lock-free-architecture.md
+      - Atomic Memory Ordering: spmc-ring-buffer/atomic-memory-ordering.md
+      - Cache-Line Padding: spmc-ring-buffer/cache-line-padding.md
+      - Zero-Mutex Producer: spmc-ring-buffer/zero-mutex-producer.md
+      - Multi-Consumer Scaling: spmc-ring-buffer/multi-consumer-scaling.md
+      - Saturation & Backpressure: spmc-ring-buffer/saturation-and-backpressure.md
   - Hardware Identity & TPM:
-    - "Anti-Cloning Protections": hardware-identity-tpm/anti-cloning-protections.md
-    - "Attestation Architecture": hardware-identity-tpm/attestation-architecture.md
-    - "Hardware Identity & TPM": hardware-identity-tpm/index.md
-    - "Quote Verification Flow": hardware-identity-tpm/quote-verification-flow.md
-    - "Tier 1: Physical TPM 2.0": hardware-identity-tpm/tier1-physical-tpm2.md
-    - "Tier 2: Virtual TPM": hardware-identity-tpm/tier2-virtual-tpm.md
-    - "Tier 3: DMI Fallback": hardware-identity-tpm/tier3-dmi-fallback.md
-    - "TPM 2.0 PCR Measurements": hardware-identity-tpm/tpm2-pcr-measurements.md
+      - Attestation Architecture: hardware-identity-tpm/attestation-architecture.md
+      - Tier 1 Physical TPM 2.0: hardware-identity-tpm/tier1-physical-tpm2.md
+      - PCR Measurements & Quotes: hardware-identity-tpm/tpm2-pcr-measurements.md
+      - Tier 2 Virtual TPM: hardware-identity-tpm/tier2-virtual-tpm.md
+      - Tier 3 DMI Fallback: hardware-identity-tpm/tier3-dmi-fallback.md
+      - Anti-Cloning Protections: hardware-identity-tpm/anti-cloning-protections.md
+      - Quote Verification Flow: hardware-identity-tpm/quote-verification-flow.md
   - AF_XDP Zero-Copy:
-    - "AF_XDP Zero-Copy": af-xdp-zero-copy/index.md
-    - "Line-Rate Saturation on 10GbE": af-xdp-zero-copy/line-rate-saturation-10gbe.md
-    - "Multi-Core RSS Queues": af-xdp-zero-copy/multi-core-rss-queues.md
-    - "RX & Fill Rings": af-xdp-zero-copy/rx-fill-rings.md
-    - "UMEM Architecture": af-xdp-zero-copy/umem-architecture.md
-    - "Zero-Copy Packet Transfer": af-xdp-zero-copy/zero-copy-packet-transfer.md
-  - ModelConfig Binding:
-    - "Dynamic Tensor Binding": model-config/dynamic-tensor-binding.md
-    - "ModelConfig Binding": model-config/index.md
-    - "Mapping Tensor Dimensions": model-config/mapping-tensor-dimensions.md
-    - "ModelConfig Schema": model-config/model-config-schema.md
-    - "Threshold & Mitigation Rules": model-config/threshold-and-mitigation-rules.md
+      - UMEM Architecture: af-xdp-zero-copy/umem-architecture.md
+      - Rx & Fill Rings: af-xdp-zero-copy/rx-fill-rings.md
+      - Zero-Copy Transfer: af-xdp-zero-copy/zero-copy-packet-transfer.md
+      - 10GbE Line-Rate Saturation: af-xdp-zero-copy/line-rate-saturation-10gbe.md
+      - Multi-Core RSS Queues: af-xdp-zero-copy/multi-core-rss-queues.md
+  - Model Configuration:
+      - Dynamic Tensor Binding: model-config/dynamic-tensor-binding.md
+      - Mapping Tensor Dimensions: model-config/mapping-tensor-dimensions.md
+      - Model Config Schema: model-config/model-config-schema.md
+      - Threshold & Mitigation Rules: model-config/threshold-and-mitigation-rules.md
   - API Reference:
-    - "Data Structures": api-reference/data-structures.md
-    - "Error Codes": api-reference/error-codes.md
-    - "blackbox::EventRingBuffer": api-reference/event-ring-buffer.md
-    - "blackbox::HardwareIdentity": api-reference/hardware-identity.md
-    - "API Reference": api-reference/index.md
-    - "blackbox::KernelTelemetry": api-reference/kernel-telemetry.md
-    - "blackbox::ModelConfig": api-reference/model-config.md
-    - "blackbox::XdpManager": api-reference/xdp-manager.md
+      - Overview (Namespace blackbox): api-reference/index.md
+      - XdpManager: api-reference/xdp-manager.md
+      - EventRingBuffer: api-reference/event-ring-buffer.md
+      - HardwareIdentity: api-reference/hardware-identity.md
+      - ModelConfig: api-reference/model-config.md
+      - KernelTelemetry: api-reference/kernel-telemetry.md
+      - Data Structures: api-reference/data-structures.md
+      - Error Codes & Exceptions: api-reference/error-codes.md
   - Tutorials:
-    - "XDP on VMware vNICs": tutorials/attaching-xdp-to-vmware-vnic.md
-    - "In-Kernel Firewall in 50 Lines": tutorials/building-in-kernel-firewall.md
-    - "Extracting TPM 2.0 Quotes": tutorials/extracting-tpm2-quotes.md
-    - "Packet Blaster Testing": tutorials/high-rate-packet-blaster-testing.md
-    - "Tutorials": tutorials/index.md
-    - "Wiring XDP to xInfer": tutorials/wiring-xdp-to-xinfer.md
+      - Wire-Speed Firewall in 50 Lines: tutorials/building-in-kernel-firewall.md
+      - Attaching XDP to VMware vNIC: tutorials/attaching-xdp-to-vmware-vnic.md
+      - Extracting TPM 2.0 Quotes: tutorials/extracting-tpm2-quotes.md
+      - Wiring XDP to xInfer: tutorials/wiring-xdp-to-xinfer.md
+      - 1M+ EPS Stress Blaster: tutorials/high-rate-packet-blaster-testing.md
   - Benchmarking:
-    - "CPU Cycle Profiling": benchmarking/cpu-cycle-profiling.md
-    - "Benchmarking": benchmarking/index.md
-    - "Latency Percentiles": benchmarking/latency-percentiles.md
-    - "Memory Saturation Benchmarks": benchmarking/memory-saturation-benchmarks.md
-    - "Benchmark Methodology": benchmarking/methodology.md
-    - "XDP vs. iptables/nftables": benchmarking/xdp-vs-iptables-nftables.md
-    - "XDP vs. Suricata NFQUEUE": benchmarking/xdp-vs-suricata-nfqueue.md
-  - Compliance:
-    - "Audit Log Tamper Evidence": compliance/audit-log-tamper-evidence.md
-    - "CMMC 2.0 Level 2": compliance/cmmc-level-2.md
-    - "EU NIS2 Compliance": compliance/eu-nis2-compliance.md
-    - "IEC 62443 Industrial": compliance/iec-62443-industrial.md
-    - "Compliance": compliance/index.md
-  - Troubleshooting:
-    - "BPF Verifier Rejections": troubleshooting/bpf-verifier-rejection-guide.md
-    - "Technical FAQ": troubleshooting/faq.md
-    - "Troubleshooting": troubleshooting/index.md
-    - "Support Channels": troubleshooting/support.md
-    - "TPM Permission & Device Errors": troubleshooting/tpm-permission-and-device-errors.md
-    - "VMware & veth SKB Issues": troubleshooting/vmware-veth-skb-issues.md
-    - "XDP Attachment Failures": troubleshooting/xdp-attachment-failures.md
+      - Methodology: benchmarking/methodology.md
+      - Latency Percentiles: benchmarking/latency-percentiles.md
+      - XDP vs iptables/nftables: benchmarking/xdp-vs-iptables-nftables.md
+      - XDP vs Suricata NFQUEUE: benchmarking/xdp-vs-suricata-nfqueue.md
+      - CPU Cycle Profiling: benchmarking/cpu-cycle-profiling.md
+      - Saturation Benchmarks: benchmarking/memory-saturation-benchmarks.md
+  - Compliance & Certification:
+      - CMMC Level 2 (SI.L2-3.14.1): compliance/cmmc-level-2.md
+      - IEC 62443-3-3 Industrial: compliance/iec-62443-industrial.md
+      - EU NIS2 Article 21: compliance/eu-nis2-compliance.md
+      - Tamper-Evident Audit Logs: compliance/audit-log-tamper-evidence.md
+  - Troubleshooting & Help Desk:
+      - BPF Verifier Rejections: troubleshooting/bpf-verifier-rejection-guide.md
+      - XDP Attachment Failures: troubleshooting/xdp-attachment-failures.md
+      - TPM Permission & Device Errors: troubleshooting/tpm-permission-and-device-errors.md
+      - VMware veth & SKB Issues: troubleshooting/vmware-veth-skb-issues.md
+      - FAQ: troubleshooting/faq.md
+      - Support & SLAs: troubleshooting/support.md
