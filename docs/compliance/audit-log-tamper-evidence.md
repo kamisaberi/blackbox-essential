@@ -105,27 +105,3 @@ blackbox-ctl audit verify --log-file /var/log/blackbox/mitigation.log --pcr-inde
 ```
 ```
 
----
-
-### Complete in Part 11
-- `blackbox-essential/docs/compliance/cmmc-level-2.md`
-- `blackbox-essential/docs/compliance/iec-62443-industrial.md`
-- `blackbox-essential/docs/compliance/eu-nis2-compliance.md`
-- `blackbox-essential/docs/compliance/audit-log-tamper-evidence.md`
-
-All 4 Compliance and Regulatory Certification documentation files are now generated.
-
----
-
-### Files to be Generated in Part 12 (Final Phase for Project 2)
-
-The final phase covers **Troubleshooting & Help Desk Diagnostics** (`troubleshooting/`), completing the entire documentation tree for `blackbox-essential`:
-
-1. `troubleshooting/bpf-verifier-rejection-guide.md` (Debugging `R1 invalid mem access`, unbounded loops, and stack size)
-2. `troubleshooting/xdp-attachment-failures.md` (Resolving "Operation not supported" and driver attachment errors)
-3. `troubleshooting/tpm-permission-and-device-errors.md` (Fixing `/dev/tpmrm0` access denied and missing resource manager)
-4. `troubleshooting/vmware-veth-skb-issues.md` (Debugging packet drops on VMware virtual interfaces and veth)
-5. `troubleshooting/faq.md` (Technical Frequently Asked Questions)
-6. `troubleshooting/support.md` (Issue tracker, security vulnerability disclosure, and support SLAs)
-
-Confirm when you are ready to proceed with Part 12.
