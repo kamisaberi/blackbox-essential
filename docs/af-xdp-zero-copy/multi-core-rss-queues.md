@@ -83,26 +83,3 @@ void run_multiqueue_service(const std::string& interface_name, uint32_t num_queu
 | **16 Queues** | 16 Cores | **$14.88\text{ Mpps}$ (10GbE Line Rate)** |
 ```
 
----
-
-### Complete in Part 6
-- `blackbox-essential/docs/af-xdp-zero-copy/umem-architecture.md`
-- `blackbox-essential/docs/af-xdp-zero-copy/rx-fill-rings.md`
-- `blackbox-essential/docs/af-xdp-zero-copy/zero-copy-packet-transfer.md`
-- `blackbox-essential/docs/af-xdp-zero-copy/line-rate-saturation-10gbe.md`
-- `blackbox-essential/docs/af-xdp-zero-copy/multi-core-rss-queues.md`
-
-All 5 AF_XDP Zero-Copy documentation files are now generated.
-
----
-
-### Files to be Generated in Part 7
-
-The next phase covers **Decoupled Machine Learning Binding** (`model-config/`):
-
-1. `model-config/dynamic-tensor-binding.md` (Decoupling C++ security engines from neural network topologies)
-2. `model-config/mapping-tensor-dimensions.md` (Binding arbitrary input dimensions: 32-dim, 42-dim, 80-dim)
-3. `model-config/model-config-schema.md` (JSON/YAML declarative configuration schema definition)
-4. `model-config/threshold-and-mitigation-rules.md` (Mapping model output probabilities to in-kernel drop actions)
-
-Confirm when you are ready to proceed with Part 7.
