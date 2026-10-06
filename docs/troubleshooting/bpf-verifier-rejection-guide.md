@@ -1,12 +1,3 @@
-### Part 12: Troubleshooting & Help Desk System (`troubleshooting/*`)
-
-This final section covers kernel verifier diagnostics, driver attachment fault isolation, TPM device and udev resolution, virtualized VMware/veth edge cases, technical FAQs, and enterprise support escalation protocols for `blackbox-essential`.
-
----
-
-### File: `blackbox-essential/docs/troubleshooting/bpf-verifier-rejection-guide.md`
-
-```markdown
 # BPF Verifier Rejection Diagnostics & Remediation
 
 When compiling or loading `xdp_filter.o`, the Linux kernel BPF Verifier may reject the bytecode with a multi-page instruction trace. This guide translates common verifier errors into specific remediation steps.
@@ -79,6 +70,5 @@ Force complete loop unrolling using the Clang unroll pragma:
 for (int i = 0; i < 4; ++i) {
     // Fixed, bounded unrolled execution path
 }
-```
 ```
 

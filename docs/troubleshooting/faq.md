@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/troubleshooting/faq.md`
-
-```markdown
 # Technical Frequently Asked Questions (FAQ)
 
 ---
@@ -37,5 +32,4 @@ For $1{,}000{,}000\text{ IPs}$, the kernel map consumes $\approx 32\,\text{MB}$ 
 * `CAP_NET_ADMIN`: Required to attach XDP programs to netdevs.
 * `CAP_BPF` (or `CAP_SYS_ADMIN` on older kernels): Required to load BPF bytecode and create maps.
 * `CAP_SYS_RESOURCE`: Required to set `ulimit -l` (unlimited memory locking).
-```
 

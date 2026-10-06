@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/troubleshooting/vmware-veth-skb-issues.md`
-
-```markdown
 # VMware & Virtual Ethernet (`veth`) Edge Cases
 
 Running in-kernel XDP filters across virtualized environments (such as Docker-in-VMware or multi-homed ESXi hosts) introduces virtual switch and packet delivery quirks.
@@ -50,5 +45,4 @@ In VMware vSphere / ESXi host settings, edit the Port Group security policy:
 ```
 
 Set all three policies to **Accept** to allow raw packet flows to reach the `vmxnet3` driver.
-```
 

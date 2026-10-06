@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/troubleshooting/xdp-attachment-failures.md`
-
-```markdown
 # XDP Driver Attachment Failures
 
 This guide resolves errors encountered when invoking `XdpManager::attach()` or attaching `xdp_filter.o` via `ip link`.
@@ -58,5 +53,4 @@ sudo ip link set dev eth0 xdpgeneric off
 ```
 
 Then restart `blackbox-essential`.
-```
 
