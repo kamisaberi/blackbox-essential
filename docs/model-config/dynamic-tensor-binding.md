@@ -1,12 +1,3 @@
-### Part 7: Decoupled Machine Learning Binding (`model-config/*`)
-
-This section contains 4 architectural and configuration guides detailing how `blackbox-essential` decouples its C++ packet mitigation engine from neural network topologies: dynamic tensor binding, arbitrary dimension mappings, declarative schema definitions, and probability-to-kernel-drop threshold rules.
-
----
-
-### File: `blackbox-essential/docs/model-config/dynamic-tensor-binding.md`
-
-```markdown
 # Dynamic Tensor Binding: Decoupling C++ Engines from AI Models
 
 Hardcoding feature extraction logic into low-level C++ network engines creates tight coupling: every time a data science team updates a model's feature set (e.g., adding TLS JA4 fingerprints or expanding from a 32-dim to an 80-dim flow vector), the kernel-adjacent C++ binary must be recompiled, tested, and redeployed.
@@ -89,5 +80,4 @@ private:
 
 1. **Zero Runtime Allocation:** Once initialized, the dynamic binder executes over pre-allocated contiguous arrays, performing zero heap allocations during live packet inspection.
 2. **Schema Validation on Load:** Tensor dimensions declared in the configuration are verified against the loaded ONNX/RKNN model's input shape before the engine attaches to network interfaces.
-```
 

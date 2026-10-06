@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/model-config/mapping-tensor-dimensions.md`
-
-```markdown
 # Mapping Arbitrary Tensor Dimensions (32-dim, 42-dim, 80-dim)
 
 `blackbox-essential` supports diverse neural network topologies by providing pre-built mapping dictionaries for common security benchmarks and industrial telemetry profiles.
@@ -93,6 +88,5 @@ struct FeatureBindingRule {
 };
 
 } // namespace blackbox
-```
 ```
 

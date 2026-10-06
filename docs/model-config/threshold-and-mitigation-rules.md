@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/model-config/threshold-and-mitigation-rules.md`
-
-```markdown
 # Mapping Model Probabilities to In-Kernel Drop Actions
 
 Once an inference pass completes, continuous output values (such as an autoencoder reconstruction loss or a classification probability) must be translated into discrete, microsecond packet mitigation decisions.
@@ -81,31 +76,3 @@ Under active attack conditions, `MitigationArbiter` scales TTL durations dynamic
 $$\text{TTL}_{\text{new}} = \min\left(\text{TTL}_{\text{base}} \times 2^{\text{repeat\_count}},\, 86400\,\text{s}\right)$$
 
 This mechanism shields critical infrastructure while allowing transient network glitches to clear automatically without manual operator intervention.
-```
-
----
-
-### Complete in Part 7
-- `blackbox-essential/docs/model-config/dynamic-tensor-binding.md`
-- `blackbox-essential/docs/model-config/mapping-tensor-dimensions.md`
-- `blackbox-essential/docs/model-config/model-config-schema.md`
-- `blackbox-essential/docs/model-config/threshold-and-mitigation-rules.md`
-
-All 4 Model Configuration documentation files are now generated.
-
----
-
-### Files to be Generated in Part 8
-
-The next phase covers the complete **C++20 API Reference** (`api-reference/`):
-
-1. `api-reference/index.md` (Namespace overview `blackbox::`)
-2. `api-reference/xdp-manager.md` (Class `blackbox::XdpManager`)
-3. `api-reference/event-ring-buffer.md` (Class `blackbox::EventRingBuffer`)
-4. `api-reference/hardware-identity.md` (Class `blackbox::HardwareIdentity`)
-5. `api-reference/model-config.md` (Class `blackbox::ModelConfig`)
-6. `api-reference/kernel-telemetry.md` (Struct `blackbox::KernelTelemetry`)
-7. `api-reference/data-structures.md` (Structs `XdpConfig`, `IdentityClaims`, `BlockedIpEntry`)
-8. `api-reference/error-codes.md` (Class `blackbox::BlackboxException` & return codes)
-
-Confirm when you are ready to proceed with Part 8.

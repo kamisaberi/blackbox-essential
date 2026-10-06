@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/model-config/model-config-schema.md`
-
-```markdown
 # Declarative Model Configuration Schema (`model_config.yaml`)
 
 The `blackbox::ModelConfig` subsystem is configured through an immutable YAML manifest. This file declares model metadata, input/output tensor shapes, normalization rules, and mitigation thresholds.
@@ -78,5 +73,4 @@ When `libblackbox.so` parses `model_config.yaml`:
 1. **Length Invariant:** The number of declared elements in the `features` array **must exactly match** the secondary dimension of `tensor_input.dimensions` (e.g., exactly 32 features for `[1, 32]`).
 2. **Cryptographic Check:** The SHA-256 hash defined in `metadata.sha256_hash` is verified against the physical model binary on disk via `xinfer::ModelHub` before execution begins.
 3. **Strict Bounds:** If `transform: "MINMAX"` is declared, `max` must be strictly greater than `min`.
-```
 
