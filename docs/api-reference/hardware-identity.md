@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/hardware-identity.md`
-
-```markdown
 # Class `blackbox::HardwareIdentity`
 
 Defined in header `<blackbox/hardware_identity.hpp>`  
@@ -64,5 +59,4 @@ Generates a signed TPM 2.0 quote certifying PCR 0 (BIOS) and PCR 4 (Bootloader) 
 IdentityTier active_tier() const noexcept;
 ```
 Returns the operational identity level: `TIER1_PHYSICAL_TPM`, `TIER2_VTPM`, or `TIER3_DMI_FALLBACK`.
-```
 

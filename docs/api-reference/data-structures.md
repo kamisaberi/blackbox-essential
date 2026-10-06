@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/data-structures.md`
-
-```markdown
 # Core Data Structures & Configurations
 
 Defined in header `<blackbox/types.hpp>`  
@@ -81,6 +76,5 @@ struct IdentityClaims {
     std::vector<uint8_t> aik_public_cert{};
     uint64_t timestamp_ns{0};
 };
-```
 ```
 

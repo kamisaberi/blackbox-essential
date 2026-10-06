@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/event-ring-buffer.md`
-
-```markdown
 # Class `blackbox::EventRingBuffer`
 
 Defined in header `<blackbox/event_ring_buffer.hpp>`  
@@ -69,5 +64,4 @@ Called exclusively by the single network driver ingestion thread. Evaluates in $
 bool try_dequeue(FlowEvent& out_event) noexcept;
 ```
 Safe for concurrent invocation by multiple worker threads. Uses an atomic Compare-And-Swap (CAS) loop on the read index. Returns `true` if an event was claimed and copied into `out_event`, or `false` if the ring is empty.
-```
 

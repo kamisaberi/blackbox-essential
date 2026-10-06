@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/model-config.md`
-
-```markdown
 # Class `blackbox::ModelConfig`
 
 Defined in header `<blackbox/model_config.hpp>`  
@@ -58,6 +53,5 @@ void load_and_inspect() {
                                     << config.input_spec().dimensions[1] << "]\n"
               << "Drop Action  : " << config.policy().on_anomaly << "\n";
 }
-```
 ```
 

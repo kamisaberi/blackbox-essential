@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/xdp-manager.md`
-
-```markdown
 # Class `blackbox::XdpManager`
 
 Defined in header `<blackbox/xdp_manager.hpp>`  
@@ -88,5 +83,4 @@ Inserts or updates an entry in the kernel's `blocked_ip_map`. `ipv4_net_order` m
 KernelTelemetry get_telemetry() const;
 ```
 Gathers per-CPU telemetry counters from the kernel and aggregates processed packets, bytes, and drop statistics.
-```
 

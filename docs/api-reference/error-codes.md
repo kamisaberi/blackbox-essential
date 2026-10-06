@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/error-codes.md`
-
-```markdown
 # Class `blackbox::BlackboxException` & Error Codes
 
 Defined in header `<blackbox/exception.hpp>`  
@@ -81,6 +76,5 @@ int main() {
 
     return 0;
 }
-```
 ```
 

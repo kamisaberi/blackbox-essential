@@ -1,12 +1,3 @@
-### Part 8: Complete C++20 API Reference (`api-reference/*`)
-
-This section contains the formal C++20 API reference for `blackbox-essential`: the namespace overview, manager classes, ring buffer primitives, hardware identity drivers, model binding schemas, telemetry structs, data types, and exception hierarchies.
-
----
-
-### File: `blackbox-essential/docs/api-reference/index.md`
-
-```markdown
 # API Reference Overview
 
 The `blackbox-essential` C++20 API provides a high-performance, deterministic programming interface for configuring Linux eBPF/XDP kernel filters, managing lock-free Single-Producer Multi-Consumer (SPMC) ring buffers, and generating cryptographic TPM 2.0 hardware attestation claims.
@@ -40,5 +31,4 @@ Alternatively, include modular headers for granular compilation:
 1. **Explicit Resource Boundaries (RAII):** Attaching to network drivers and binding TPM contexts acquire persistent system resources. Destructors guarantee that eBPF programs are cleanly unhooked and hardware session handles are released.
 2. **Zero-Copy Interoperability:** Network payloads, telemetry frames, and tensor views interface via non-owning `std::span` buffers, preventing heap churn on the critical path.
 3. **Deterministic Error Handling:** Methods on the microsecond mitigation path use `noexcept` specifications and return status codes, while initialization and configuration routines raise strongly-typed `BlackboxException` instances on unrecoverable failures.
-```
 

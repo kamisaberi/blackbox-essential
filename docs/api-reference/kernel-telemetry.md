@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/api-reference/kernel-telemetry.md`
-
-```markdown
 # Struct `blackbox::KernelTelemetry`
 
 Defined in header `<blackbox/telemetry.hpp>`  
@@ -53,5 +48,4 @@ struct KernelTelemetry {
 | `total_packets_passed` | `uint64_t` | Total clean frames forwarded to Linux network stack. |
 | `drop_rate_percentage` | `double` | Current ratio of dropped traffic: $\frac{\text{dropped}}{\text{total}} \times 100$. |
 | `active_blocked_ips` | `uint64_t` | Number of IPv4 addresses currently locked in kernel hash buckets. |
-```
 
