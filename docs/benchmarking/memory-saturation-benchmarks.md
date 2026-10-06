@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/benchmarking/memory-saturation-benchmarks.md`
-
-```markdown
 # Memory Saturation Benchmarks: 1.25M+ EPS Ring Buffer Scaling
 
 This document evaluates the multi-threaded throughput and memory stability of `blackbox::EventRingBuffer` under saturation workloads.
@@ -46,5 +41,4 @@ Memory utilization was monitored during a continuous 24-hour saturation run ($1.
 * **Dynamic Allocations during Test:** **$0\text{ bytes}$**.
 * **Page Faults:** $0$ (All virtual pages are locked into physical memory via `mlock()`).
 * **Memory Growth Rate:** $\pm 0.00\,\text{KB/hour}$ (Zero heap fragmentation).
-```
 

@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/benchmarking/xdp-vs-iptables-nftables.md`
-
-```markdown
 # Comparative Analysis: eBPF/XDP vs. Linux Netfilter
 
 Linux Netfilter (`iptables` and `nftables`) is the standard firewall framework in Linux. Under volumetric denial-of-service conditions, Netfilter introduces significant CPU load because packets must traverse the kernel's network stack before filtering occurs.
@@ -45,5 +40,4 @@ When traffic exceeds $2.5\text{ Mpps}$, Netfilter experiences:
 3. **Collateral Packet Loss:** Legitimate control frames (e.g., Modbus, SSH) are discarded in the hardware ring buffer because the host cannot process packets fast enough.
 
 By contrast, `blackbox-essential` drops packets before socket buffers are allocated, allowing the host to maintain normal operations during volumetric floods.
-```
 

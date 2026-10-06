@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/benchmarking/latency-percentiles.md`
-
-```markdown
 # Empirical Latency Distributions & Percentile Analysis
 
 This document details the empirical packet mitigation latency of `blackbox-essential` measured from physical wire reception to in-kernel drop confirmation (`XDP_DROP`).
@@ -46,5 +41,4 @@ In mission-critical industrial applications (e.g., IEC 61850 GOOSE/SV communicat
 * **Generic SKB Mode Jitter:** $\sigma = 0.890\,\mu\text{s}$ ($890\,\text{ns}$).
 
 Operating in Native Driver Mode maintains sub-microsecond determinism by avoiding memory page allocations and kernel thread scheduling.
-```
 

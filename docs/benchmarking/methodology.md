@@ -1,12 +1,3 @@
-### Part 10: Benchmarking & Performance Profiling (`benchmarking/*`)
-
-This section contains 6 technical benchmarking specifications, comparative studies, and hardware profiling procedures for `blackbox-essential`: latency percentiles, comparisons against Linux Netfilter (`iptables`/`nftables`) and userspace IPS engines (`Suricata NFQUEUE`), CPU cycle profiling ($< 120$ cycles per drop), and ring buffer saturation benchmarks.
-
----
-
-### File: `blackbox-essential/docs/benchmarking/methodology.md`
-
-```markdown
 # Benchmarking Methodology & Hardware Testbed Standards
 
 Evaluating sub-microsecond in-kernel networking requires dedicated bare-metal hardware and hardware-level packet generation. Operating system virtualization, shared network switches, and unpinned user-space timers introduce measurement jitter that corrupts microsecond-level benchmarking.
@@ -45,5 +36,4 @@ All empirical performance benchmarks documented for `blackbox-essential` were co
 2. **Line-Rate Target:** $14.88\text{ Mpps}$ sustained on $10\text{ GbE}$ interfaces; $37.2\text{ Mpps}$ sustained on $25\text{ GbE}$ interfaces.
 3. **Statistical Sample Size:** Latency and cycle measurements are captured over $N = 10{,}000{,}000$ consecutive packets.
 4. **Hardware Timestamping:** Latency is measured by reading hardware ingress and egress timestamps directly from the Intel E810 NIC MAC/PHY layer, eliminating host OS timer distortion.
-```
 

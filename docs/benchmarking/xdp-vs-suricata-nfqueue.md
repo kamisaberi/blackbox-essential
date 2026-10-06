@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/benchmarking/xdp-vs-suricata-nfqueue.md`
-
-```markdown
 # Comparative Analysis: Driver-Level XDP vs. Userspace NFQUEUE
 
 Intrusion Prevention Systems (such as **Suricata** and **Snort 3**) running in inline mode use the Linux `NFQUEUE` subsystem to transfer packet payloads into user space for inspection and policy enforcement.
@@ -43,5 +38,4 @@ Testing against a continuous $10\text{ Gbps}$ mixed-traffic stream:
 * **Queuing Delay:** Under line-rate traffic, internal user-space ring queues fill up, adding tens of milliseconds of latency before packets are evaluated.
 
 `blackbox-essential` avoids these overheads by executing mitigation rules directly within the driver's NAPI poll routine.
-```
 

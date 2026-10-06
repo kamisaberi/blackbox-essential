@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/benchmarking/cpu-cycle-profiling.md`
-
-```markdown
 # CPU Cycle Profiling: Sub-120 Cycles per Packet Drop
 
 Operating within a sub-microsecond mitigation SLA requires keeping the CPU instruction count per packet low. 
@@ -59,5 +54,4 @@ sudo perf stat -C 2 -e cycles,instructions,cache-misses,branch-misses sleep 5
 ### Analysis
 * **Instructions per Cycle (IPC):** $1.24$ (Reflects clean pipeline execution without memory stalls).
 * **Cache Miss Ratio:** $0.01\%$ (The pre-allocated BPF hash map remains resident in the processor's Level 2 and Level 3 caches during active mitigation).
-```
 
