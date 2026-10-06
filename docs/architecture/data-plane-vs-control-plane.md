@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/architecture/data-plane-vs-control-plane.md`
-
-```markdown
 # Data Plane vs. Control Plane Architecture
 
 `blackbox-essential` enforces an architectural boundary between its high-throughput **in-kernel Data Plane** and its flexible **user-space Control Plane**.
@@ -69,5 +64,4 @@ The Control Plane and Data Plane communicate through three BPF map structures:
 * **Type:** `BPF_MAP_TYPE_RINGBUF`
 * **Access Pattern:**
   * Data Plane: Streams packet headers and threat events to user-space workers for continuous AI scoring.
-```
 

@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/architecture/zero-skb-allocation.md`
-
-```markdown
 # Zero-`sk_buff` Memory Allocation
 
 The primary bottleneck in the Linux network stack under heavy traffic is the allocation, initialization, and de-allocation of **`struct sk_buff`** (socket buffer) descriptors. 
@@ -81,5 +76,4 @@ When `xdp_threat_filter()` returns `XDP_DROP`, the network card driver recycles 
 | **Bytes Allocated in RAM** | $\sim 240\text{ bytes} + \text{frame length}$ | **0 bytes** |
 | **CPU Cache Invalidation** | High (Writes across 4 cache lines) | **None** (Reads frame header only) |
 | **Max Dropping Capacity** | $\sim 1.8\text{ Mpps}$ | **$> 14.8\text{ Mpps}$ (Line Rate)** |
-```
 

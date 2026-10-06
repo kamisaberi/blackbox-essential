@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/architecture/sub-microsecond-physics.md`
-
-```markdown
 # The Physics of Sub-Microsecond Network Mitigation
 
 Traditional enterprise firewalls, Intrusion Prevention Systems (IPS), and Security Information and Event Management (SIEM) agents operate in user-space or across the cloud. When protecting critical infrastructure—such as electrical sub-stations, nuclear turbine controls, and high-frequency market bridges—alert latencies of seconds or milliseconds represent critical security failures.
@@ -67,5 +62,4 @@ Of these $2{,}520$ available cycles:
 * Margin for memory bus jitter and LLC cache misses: $\sim 600$ cycles.
 
 By constraining execution to driver space, `blackbox-essential` drops packets within the hardware cycle budget of the host CPU.
-```
 

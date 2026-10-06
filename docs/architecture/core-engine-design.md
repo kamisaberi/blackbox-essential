@@ -1,12 +1,3 @@
-### Part 2: Deep Systems Design (`architecture/*`)
-
-This section contains 5 architectural specifications detailing the internal mechanics of `blackbox-essential`: decoupled subsystem orchestration, the microsecond physics of wire-speed mitigation, zero-`sk_buff` memory mechanics, data/control plane separation, and kernel-userspace ABI contracts.
-
----
-
-### File: `blackbox-essential/docs/architecture/core-engine-design.md`
-
-```markdown
 # Decoupled Tier 2 Architecture & Execution Pipeline
 
 `blackbox-essential` (`libblackbox.so`) serves as the foundational active mitigation core within the Aryorithm ecosystem. It sits between hardware networking silicon (Tier 1/NIC) and higher-level cyber-physical XDR daemons (Tier 3 `blackbox-sentinel`), ensuring that threat mitigation decisions execute with sub-microsecond determinism.
@@ -98,5 +89,4 @@ When an incoming Ethernet frame arrives at the physical physical coding sublayer
 5. **Mitigation Decision:**
    * **Hit:** Returns `XDP_DROP` immediately ($< 0.84\,\mu\text{s}$). Driver recycles the RX descriptor back to the hardware ring.
    * **Miss:** Returns `XDP_PASS`. Packet proceeds to the Linux kernel TCP/IP networking stack.
-```
 

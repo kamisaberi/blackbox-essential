@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/architecture/kernel-userspace-abi.md`
-
-```markdown
 # Kernel-Userspace ABI Stability & Shared Data Layout
 
 Because `blackbox-essential` bridges C eBPF kernel code and an ISO C++20 user-space runtime, strict Application Binary Interface (ABI) stability is enforced across the kernel boundary. Any divergence in struct padding, member alignment, or byte order will corrupt telemetry or cause map lookup failures.
@@ -86,7 +81,6 @@ inline int sys_bpf_map_update(int map_fd, const void* key, const void* value, ui
 ```
 
 This interaction occurs without holding system locks or allocating kernel buffers outside the pre-allocated map bounds.
-```
 
 ---
 
