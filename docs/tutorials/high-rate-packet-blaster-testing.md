@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/tutorials/high-rate-packet-blaster-testing.md`
-
-```markdown
 # Stress-Testing the SPMC Ring Buffer with 1M+ Packets/sec
 
 This tutorial demonstrates how to benchmark and stress-test the `blackbox::EventRingBuffer` under heavy workloads exceeding **1,250,000 events per second**, measuring consumer lock-free contention, tail drops, and CPU cycle consumption.
@@ -149,6 +144,5 @@ Sustained Throughput   : 1461560.9 EPS (1.46M EPS)
 Per-Event Latency      : 684.2 ns
 
 [PASS] Sustained Throughput Exceeds 1.25M EPS SLA!
-```
 ```
 

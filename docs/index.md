@@ -1,9 +1,3 @@
-
----
-
-### File: `blackbox-essential/docs/index.md`
-
-```markdown
 # Blackbox Essential (`libblackbox.so`)
 
 **Active Cyber-Physical Threat Mitigation Core**  
@@ -124,5 +118,4 @@ int main() {
 * **Kernel Memory Allocation:** $0$ bytes allocated in the fast path (`sk_buff` generation bypassed).
 * **Ring Buffer Throughput:** $1{,}250{,}000\text{ EPS}$ sustained per NUMA node.
 * **Hardware Attestation:** Physical TPM 2.0 PCR Quote generated and signed in $< 48\,\text{ms}$.
-```
 

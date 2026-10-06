@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/tutorials/attaching-xdp-to-vmware-vnic.md`
-
-```markdown
 # Configuring eBPF/XDP on VMware `ens33` / `vmxnet3` Virtual Interfaces
 
 Running in-kernel XDP filters inside virtualized environments (such as **VMware Workstation, VMware Fusion, or VMware vSphere ESXi**) requires tuning virtual network adapter drivers to permit native driver execution.
@@ -97,5 +92,4 @@ ip link show dev ens33
 ```
 
 If `xdpgeneric` appears instead of `xdp`, ensure `gro` and `lro` are disabled via `ethtool -k ens33`.
-```
 

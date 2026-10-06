@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/tutorials/wiring-xdp-to-xinfer.md`
-
-```markdown
 # Wiring In-Kernel XDP Packet Filtering Directly to xInfer Neural Scoring
 
 This tutorial connects **Tier 2 Active Mitigation (`blackbox-essential`)** to **Tier 1 Neural Inference (`xinfer-essential`)**. 
@@ -170,6 +165,5 @@ clang++-16 -std=c++20 -O3 autonomous_defense.cpp -o autonomous_defense \
     -Wl,-rpath,/usr/local/lib
 
 sudo ./autonomous_defense
-```
 ```
 

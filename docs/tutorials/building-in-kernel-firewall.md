@@ -1,12 +1,3 @@
-### Part 9: Step-by-Step Practical Tutorials (`tutorials/*`)
-
-This section contains 5 end-to-end tutorials with complete, compilable ISO C++20 code for `blackbox-essential`: building a wire-speed packet firewall, configuring XDP on VMware virtual network adapters, extracting and verifying physical TPM 2.0 quotes, wiring in-kernel filtering directly to `xinfer-essential` AI scoring, and stress-testing the lock-free SPMC ring buffer with over 1 million events per second.
-
----
-
-### File: `blackbox-essential/docs/tutorials/building-in-kernel-firewall.md`
-
-```markdown
 # Building a Wire-Speed In-Kernel Firewall in 50 Lines of C++20
 
 This tutorial demonstrates how to construct a wire-speed packet-blocking firewall using `libblackbox.so`. The resulting binary attaches an eBPF program to a network interface, blocks a specified IPv4 address with an ephemeral nanosecond TTL, and prints real-time drop statistics gathered directly from the driver ring.
@@ -128,5 +119,4 @@ sudo nping --udp -c 100 --rate 50 -S 198.51.100.42 -p 80 <TARGET_HOST_IP>
 ```
 
 Notice that the drops occur at driver level: the host operating system's standard network counters (`ifconfig` / `ip -s link`) reflect zero socket buffer allocation overhead.
-```
 

@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/tutorials/extracting-tpm2-quotes.md`
-
-```markdown
 # Reading and Verifying Physical TPM 2.0 Silicon Quotes
 
 This tutorial guides you through extracting a non-spoofable hardware attestation quote from a physical TPM 2.0 chip using `blackbox::HardwareIdentity`, measuring PCR 0 and PCR 4, and verifying the quote against an external cryptographic nonce.
@@ -126,6 +121,5 @@ Quote Signature Size   : 256 bytes (RSA-2048 PSS)
 Public AIK Cert Size   : 412 bytes
 Timestamp (Monotonic)  : 1842918471209 ns
 Local Signature Verification: PASSED (AUTHENTIC SILICON)
-```
 ```
 
