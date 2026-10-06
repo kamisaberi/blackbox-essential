@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/ebpf-xdp-subsystem/bpf-map-management.md`
-
-```markdown
 # BPF Map Management & Pinned Namespaces
 
 BPF maps are structured memory pools allocated within kernel address space, enabling bidirectional communication between the high-speed data plane (`xdp_filter.o`) and the user-space control plane (`libblackbox.so`).
@@ -71,6 +66,5 @@ void insert_rule_to_kernel(int map_fd, uint32_t ip, uint64_t ttl_ns, uint32_t ru
         throw std::runtime_error("Failed to update BPF map");
     }
 }
-```
 ```
 

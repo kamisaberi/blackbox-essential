@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/ebpf-xdp-subsystem/ttl-ephemeral-expiry.md`
-
-```markdown
 # Ephemeral Nanosecond TTL Expiration Engine
 
 Threat patterns in modern networks (such as scanning bursts or volumetric SYN floods) are dynamic. Retaining blocked IP addresses indefinitely wastes memory and risks blocking legitimate hosts after dynamic IP reassignment.
@@ -83,6 +78,5 @@ void XdpManager::run_ttl_garbage_collector() {
         bpf_map_delete_elem(map_fd_, &key);
     }
 }
-```
 ```
 

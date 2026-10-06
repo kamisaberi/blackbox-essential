@@ -1,12 +1,3 @@
-### Part 3: eBPF/XDP Subsystem (`ebpf-xdp-subsystem/*`)
-
-This section contains 7 architectural and technical implementation files for the in-kernel eBPF/XDP data plane of `blackbox-essential`: frame lifecycles, driver vs. generic execution modes, kernel verifier proofs, compilation toolchains, map management, ephemeral nanosecond TTLs, and kernel lockdown signing.
-
----
-
-### File: `blackbox-essential/docs/ebpf-xdp-subsystem/xdp-filter-architecture.md`
-
-```markdown
 # XDP Filter Architecture & Packet Lifecycle
 
 The in-kernel data plane of `blackbox-essential` is implemented in `bpf/xdp_filter.c`. It attaches to the network driver ingress hook and evaluates every incoming frame before memory is allocated for socket buffers (`sk_buff`).
@@ -164,5 +155,4 @@ char _license[] SEC("license") = "Dual BSD/GPL";
 | `XDP_TX` | `3` | Bounce packet back out the same interface (used for TCP Reset reflection). |
 | `XDP_REDIRECT` | `4` | Forward frame directly to an AF_XDP user-space socket for deep inspection. |
 | `XDP_ABORTED` | `0` | Reserved for eBPF program errors (triggers driver tracepoint warning). |
-```
 

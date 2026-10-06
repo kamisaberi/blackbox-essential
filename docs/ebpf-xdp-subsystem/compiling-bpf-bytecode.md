@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/ebpf-xdp-subsystem/compiling-bpf-bytecode.md`
-
-```markdown
 # Compiling BPF Bytecode & Toolchain Pipeline
 
 Compiling eBPF bytecode requires targeting the Clang/LLVM BPF virtual machine architecture (`-target bpf`). This document details the compilation pipeline that produces `xdp_filter.o`.
@@ -93,5 +88,4 @@ llvm-objdump-16 -d build/bpf/xdp_filter.o
 ```
 
 Lines 4 and 9 illustrate the compiler emitting the bounds-checking comparison instructions before any packet dereference.
-```
 

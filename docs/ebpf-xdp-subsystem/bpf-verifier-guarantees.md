@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/ebpf-xdp-subsystem/bpf-verifier-guarantees.md`
-
-```markdown
 # BPF Verifier Guarantees & Memory Bounds Safety Proofs
 
 Before any eBPF program can be loaded into the Linux kernel, it must pass inspection by the in-kernel **BPF Verifier**. The verifier evaluates every possible instruction path, proving that the code cannot crash the operating system, access arbitrary memory, or enter an infinite loop.
@@ -66,5 +61,4 @@ The verifier tracks machine registers using abstract value types:
 | `R0` | Function return value (e.g., result of `bpf_map_lookup_elem` or final `XDP_DROP`). |
 | `R6` - `R9` | Callee-saved general-purpose registers (stores pointers to `data` and `data_end`). |
 | `R10` | **Read-Only Frame Pointer:** References the 512-byte eBPF stack space. |
-```
 

@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/ebpf-xdp-subsystem/driver-mode-vs-skb-mode.md`
-
-```markdown
 # Native Driver Mode vs. Generic SKB Mode
 
 `blackbox-essential` supports multiple XDP execution modes depending on network hardware, virtualization layers, and host driver capabilities.
@@ -89,6 +84,5 @@ ip link show dev eth0
 ### Generic Mode Output:
 ```text
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 xdpgeneric/id:42 ...
-```
 ```
 
