@@ -1,12 +1,3 @@
-### Part 11: Compliance & Regulatory Certification (`compliance/*`)
-
-This section provides compliance mappings, audit evidence extraction guides, and architectural proofs for `blackbox-essential` across primary defense and industrial standards: **CMMC 2.0 / NIST SP 800-171**, **IEC 62443-3-3 (Industrial IACS)**, **EU NIS 2 Article 21**, and **Cryptographic Tamper-Evident Audit Logging**.
-
----
-
-### File: `blackbox-essential/docs/compliance/cmmc-level-2.md`
-
-```markdown
 # CMMC 2.0 & NIST SP 800-171 Compliance Mapping
 
 The Cybersecurity Maturity Model Certification (CMMC) 2.0 Level 2 program aligns directly with the 110 security requirements of **NIST SP 800-171 Rev. 2**. 
@@ -42,6 +33,5 @@ blackbox-ctl identity --claims > cmmc_tpm_attestation.json
 
 # 3. Compile signed compliance bundle
 tar -czf cmmc_audit_evidence_$(date +%Y%m%d).tar.gz cmmc_*.json
-```
 ```
 

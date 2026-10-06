@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/compliance/iec-62443-industrial.md`
-
-```markdown
 # IEC 62443-3-3 Industrial Cyber-Physical Systems Certification
 
 The **IEC 62443** standard governs security for Industrial Automation and Control Systems (IACS). `blackbox-essential` is engineered to achieve **Security Level 3 (SL 3)** and **Security Level 4 (SL 4)** technical requirements for System Integrity and Boundary Protection under IEC 62443-3-3.
@@ -44,5 +39,4 @@ The **IEC 62443** standard governs security for Industrial Automation and Contro
 ### FR 7: Resource Availability
 * **SR 7.1 (Denial of Service Protection):** Protects field PLCs and RTUs from broadcast storms, SYN floods, and malicious malformed frames by dropping invalid traffic at $< 0.84\,\mu\text{s}$ latency.
 * **SR 7.2 (Resource Management):** Operates with a deterministic memory footprint ($< 32\text{ MB}$), ensuring continuous protection in resource-constrained industrial edge appliances.
-```
 

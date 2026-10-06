@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/compliance/eu-nis2-compliance.md`
-
-```markdown
 # EU NIS 2 Directive: Article 21 Incident Handling & Risk Mitigation
 
 The European Union **Directive on Measures for a High Common Level of Cybersecurity across the Union (NIS 2 - Directive 2022/2555)** establishes baseline cybersecurity risk-management requirements for essential and important entities across energy, water, healthcare, and transport sectors.
@@ -32,5 +27,4 @@ Under NIS 2 Article 23, entities must notify competent authorities or computer s
 * **Mitigated Threat Class** (e.g., Modbus setpoint injection, volumetric UDP flood).
 * **In-Kernel Mitigation Duration** and volume of packets suppressed.
 * **Cryptographic Attestation Token** proving node identity and policy integrity.
-```
 

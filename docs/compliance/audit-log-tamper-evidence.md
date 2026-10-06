@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/compliance/audit-log-tamper-evidence.md`
-
-```markdown
 # Cryptographic Tamper-Evident Audit Logging
 
 Regulatory compliance frameworks (including NIS 2, CMMC 2.0, and IEC 62443) mandate that security audit trails and mitigation records remain **immutable and tamper-evident**. 
@@ -102,6 +97,5 @@ blackbox-ctl audit verify --log-file /var/log/blackbox/mitigation.log --pcr-inde
 [+] Hash Chain Integrity: VERIFIED (0 Anomalies, 0 Deleted Frames)
 [+] PCR 12 Hardware Seal : MATCHED (Hardware state authenticates log integrity)
 [+] Result: AUDIT LOG IS TAMPER-EVIDENT AND COMPLIANT.
-```
 ```
 
