@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/spmc-ring-buffer/atomic-memory-ordering.md`
-
-```markdown
 # Formalizing Atomic Memory Ordering (`acquire` & `release`)
 
 Using default sequential consistency (`std::memory_order_seq_cst`) introduces full hardware memory barriers (`mfence` on x86, `dmb ish` on ARM64), stalling processor pipeline execution.
@@ -70,6 +65,5 @@ class EventRingBuffer {
 };
 
 } // namespace blackbox
-```
 ```
 

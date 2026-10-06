@@ -1,12 +1,3 @@
-### Part 4: Lock-Free SPMC Ring Buffer (`spmc-ring-buffer/*`)
-
-This section contains 6 technical specifications and C++20 implementations for the lock-free Single-Producer Multi-Consumer (SPMC) ring buffer inside `blackbox-essential`: memory ordering proofs, false-sharing elimination, wait-free enqueueing, multi-threaded consumer scaling, and backpressure mechanics sustaining **1,250,000 events per second**.
-
----
-
-### File: `blackbox-essential/docs/spmc-ring-buffer/lock-free-architecture.md`
-
-```markdown
 # Lock-Free SPMC Architecture Overview
 
 The `blackbox::EventRingBuffer` is an in-memory Single-Producer Multi-Consumer (SPMC) queue designed to transfer telemetry events from high-speed network driver threads to parallel machine learning inference workers without lock contention.
@@ -47,5 +38,4 @@ In edge appliances, network frames are ingested sequentially by a single core se
 4. **Power-of-Two Modulo Elimination:** The buffer capacity ($C$) is strictly a power of two ($2^k$). Array indexing replaces expensive integer division with bitwise masking:
 
 $$\text{Slot Index} = \text{Sequence Counter} \ \& \ (C - 1)$$
-```
 

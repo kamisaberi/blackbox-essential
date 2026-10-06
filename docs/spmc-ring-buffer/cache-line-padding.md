@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/spmc-ring-buffer/cache-line-padding.md`
-
-```markdown
 # Preventing False Sharing with Cache-Line Padding
 
 On modern multi-core processors, memory is transferred between system RAM and CPU caches in **64-byte cache lines**. 
@@ -73,5 +68,4 @@ private:
 | :--- | :--- | :--- | :--- |
 | **Unpadded (Packed struct)** | $385{,}000\text{ EPS}$ | 14.8% | $2.45\,\mu\text{s}$ |
 | **Padded (`alignas(64)`)** | **$1{,}280{,}000\text{ EPS}$** | **0.2%** | **$0.48\,\mu\text{s}$** |
-```
 

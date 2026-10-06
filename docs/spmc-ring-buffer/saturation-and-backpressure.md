@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/spmc-ring-buffer/saturation-and-backpressure.md`
-
-```markdown
 # Saturation, Backpressure & Tail-Drop Mechanics
 
 When edge appliances experience volumetric distributed denial-of-service (DDoS) attacks, network ingestion rates can exceed downstream AI inference throughput. 
@@ -72,32 +67,3 @@ If saturation exceeds $95\%$, `libblackbox.so` signals the in-kernel eBPF filter
 ```
 
 This prevents un-evaluated packets from flooding user-space memory while keeping the host operating system responsive.
-```
-
----
-
-### Complete in Part 4
-- `blackbox-essential/docs/spmc-ring-buffer/lock-free-architecture.md`
-- `blackbox-essential/docs/spmc-ring-buffer/atomic-memory-ordering.md`
-- `blackbox-essential/docs/spmc-ring-buffer/cache-line-padding.md`
-- `blackbox-essential/docs/spmc-ring-buffer/zero-mutex-producer.md`
-- `blackbox-essential/docs/spmc-ring-buffer/multi-consumer-scaling.md`
-- `blackbox-essential/docs/spmc-ring-buffer/saturation-and-backpressure.md`
-
-All 6 lock-free SPMC ring buffer documentation files are now generated.
-
----
-
-### Files to be Generated in Part 5
-
-The next phase covers **Hardware Identity & Cryptographic TPM Attestation** (`hardware-identity-tpm/`):
-
-1. `hardware-identity-tpm/attestation-architecture.md` (Why software-only identities fail in hostile environments)
-2. `hardware-identity-tpm/tier1-physical-tpm2.md` (Interfacing with `/dev/tpmrm0` via TCG TSS2 specifications)
-3. `hardware-identity-tpm/tpm2-pcr-measurements.md` (Generating cryptographic quotes over PCR 0 and PCR 4)
-4. `hardware-identity-tpm/tier2-virtual-tpm.md` (Hypervisor attestation: VMware vTPM & QEMU swtpm)
-5. `hardware-identity-tpm/tier3-dmi-fallback.md` (Motherboard DMI UUID hashing & fallback identities)
-6. `hardware-identity-tpm/anti-cloning-protections.md` (Automated detection and revocation of cloned appliances)
-7. `hardware-identity-tpm/quote-verification-flow.md` (Attestation Identity Key signature validation protocol)
-
-Confirm when you are ready to proceed with Part 5.

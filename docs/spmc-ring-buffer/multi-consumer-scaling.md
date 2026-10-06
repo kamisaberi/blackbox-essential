@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/spmc-ring-buffer/multi-consumer-scaling.md`
-
-```markdown
 # Multi-Consumer Scaling & Contention Arbitration
 
 While only one producer writes to the ring, multiple worker threads running AI inference models (`xinfer-essential`) dequeue events simultaneously. 
@@ -67,5 +62,4 @@ Traditional lock-free queues that store pointers suffer from the **ABA problem**
 `blackbox::EventRingBuffer` avoids this problem by design:
 * It uses **monotonic 64-bit sequence counters** (`uint64_t`).
 * At a rate of $10{,}000{,}000\text{ EPS}$, a 64-bit counter will not overflow for over **$58{,}494\text{ years}$**. Sequence counters never repeat within the operating lifetime of the appliance.
-```
 

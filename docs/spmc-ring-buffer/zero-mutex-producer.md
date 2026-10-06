@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/spmc-ring-buffer/zero-mutex-producer.md`
-
-```markdown
 # Zero-Mutex Producer: Non-Blocking Enqueue
 
 The producer path inside `blackbox::EventRingBuffer` interfaces with high-speed Linux network hooks (such as eBPF perf rings or AF_XDP sockets). If the producer blocks or waits on a mutex, network interface card (NIC) queues back up, resulting in unrecoverable packet loss.
@@ -51,5 +46,4 @@ bool EventRingBuffer::try_enqueue(const FlowEvent& event) noexcept {
 ## 3. CPU Cycle Budget on the Producer Path
 
 On an Intel Xeon Gold running at $3.0\,\text{GHz}$, the fast path executes in **under $32\text{ CPU cycles}$** ($\approx 10.6\,\text{ns}$), ensuring the network driver thread can process line-rate traffic bursts without CPU bottlenecks.
-```
 
