@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/getting-started/system-requirements.md`
-
-```markdown
 # System Requirements & Prerequisites
 
 Review the toolchain, kernel configuration, and driver dependencies before building and running `blackbox-essential`.
@@ -87,5 +82,4 @@ To achieve the sub-microsecond mitigation SLA, the target network interface card
 | **Mellanox ConnectX-4/5/6**| `mlx5_core` | Full Driver Mode | Yes (Up to 128 queues)| $25.0\text{ Mpps}$ |
 | **VMware Virtual NIC** | `vmxnet3` | Full Driver Mode | Yes (Up to 8 queues)  | $2.5\text{ Mpps}$ |
 | **Virtual Ethernet Pairs** | `veth` | Generic / Driver Mode| Yes | $1.8\text{ Mpps}$ |
-```
 

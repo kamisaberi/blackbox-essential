@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/getting-started/verifying-kernel-support.md`
-
-```markdown
 # Verifying Kernel Support: eBPF JIT, BTF & BPF Filesystem
 
 Before running `blackbox-essential` in production, verify that your host operating system has enabled the eBPF Just-In-Time (JIT) compiler, the BPF Type Format (BTF) subsystem, and the mounted BPF virtual filesystem (`bpffs`).
@@ -95,5 +90,4 @@ sudo bpftool feature probe
 ```
 
 Verify that `Program types: xdp` and `Map types: hash` are marked as **available**.
-```
 

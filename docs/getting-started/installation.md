@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/getting-started/installation.md`
-
-```markdown
 # Building & Installing `blackbox-essential`
 
 This guide explains how to compile the core C++20 shared library (`libblackbox.so`), compile the eBPF kernel program (`xdp_filter.o`), and install headers and libraries system-wide.
@@ -108,6 +103,5 @@ sudo ldconfig
 │       └── xdp_filter.o
 └── bin/
     └── blackbox-ctl
-```
 ```
 

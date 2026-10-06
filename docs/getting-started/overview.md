@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/getting-started/overview.md`
-
-```markdown
 # Core Mission: Sub-Microsecond Active Defense
 
 Modern industrial plants, power substations, autonomous vehicles, and financial switches cannot tolerate retrospective detection. Commercial Endpoint Detection and Response (EDR) and Security Information and Event Management (SIEM) platforms process events in user-space or the cloud, introducing **$15 - 60\text{ second}$ alert latencies**.
@@ -68,5 +63,4 @@ BLACKBOX-ESSENTIAL SUB-MICROSECOND FAST PATH (< 0.84µs Total SLA):
 1. **The In-Kernel Packet Filter (`xdp_filter.o`):** A statically verified eBPF program loaded into the NIC driver space that inspects Ethernet frames, checks IP addresses against an ephemeral in-kernel BPF hash map, and issues `XDP_DROP` instructions in $< 0.84\,\mu\text{s}$.
 2. **Lock-Free Concurrency Core (`EventRingBuffer`):** A Single-Producer Multi-Consumer (SPMC) circular ring buffer that streams packet telemetry from driver space to parallel user-space workers without mutex locks, sustaining **1.25M+ events per second**.
 3. **Silicon Hardware Identity (`HardwareIdentity`):** A multi-tier hardware attestation engine that cryptographically binds the running daemon to physical TPM 2.0 chips, preventing image cloning and unauthorized virtualization.
-```
 

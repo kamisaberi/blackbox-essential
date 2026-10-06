@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/getting-started/quickstart-drop-test.md`
-
-```markdown
 # 5-Minute Quickstart: In-Kernel Packet Drop Test
 
 This walkthrough guides you through compiling a minimal C++20 program that attaches `xdp_filter.o` to a local network interface, blocks a test IP address, and verifies packet drops directly in kernel space.
@@ -124,5 +119,4 @@ ping -c 5 -I 127.0.0.99 127.0.0.1
 ```
 
 In Terminal 2, you will observe 100% packet loss: `5 packets transmitted, 0 received, 100% packet loss`.
-```
 

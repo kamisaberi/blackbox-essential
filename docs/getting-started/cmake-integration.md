@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/getting-started/cmake-integration.md`
-
-```markdown
 # CMake Integration
 
 Integrate `blackbox-essential` into external C++ applications using modern CMake targets.
@@ -80,6 +75,5 @@ clang++-16 -std=c++20 main.cpp -o main \
     -ltss2-esys \
     -ltss2-rc \
     -Wl,-rpath,/usr/local/lib
-```
 ```
 
