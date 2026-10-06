@@ -1,12 +1,3 @@
-### Part 6: High-Throughput User-Space Networking via AF_XDP Zero-Copy (`af-xdp-zero-copy/*`)
-
-This section contains 5 technical guides and C++20 implementations for the high-throughput packet I/O engine in `blackbox-essential`: Unified Memory (UMEM) architecture, Rx and Fill ring coordination, direct NIC-to-inference zero-copy transfers, 10GbE line-rate tuning, and Receive Side Scaling (RSS) multi-queue orchestration.
-
----
-
-### File: `blackbox-essential/docs/af-xdp-zero-copy/umem-architecture.md`
-
-```markdown
 # UMEM Architecture & Memory Pool Allocation
 
 AF_XDP (Address Family XDP, formerly XSK) provides low-latency, high-throughput packet streaming between the Linux kernel and user space. At the core of AF_XDP is the **UMEM (User Memory)** area: a pre-allocated, memory-mapped virtual memory pool shared between the user-space process and the network interface card (NIC) driver.
@@ -132,6 +123,5 @@ private:
 };
 
 } // namespace blackbox
-```
 ```
 

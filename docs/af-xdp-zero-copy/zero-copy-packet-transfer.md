@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/af-xdp-zero-copy/zero-copy-packet-transfer.md`
-
-```markdown
 # Zero-Copy DMA Transfers from NIC Directly to Inference Memory
 
 In standard Linux packet capture (e.g., `libpcap`, raw sockets), packets are copied up to three times across kernel and user-space boundaries. 
@@ -87,6 +82,5 @@ auto tensor = xinfer::Tensor::create_from_raw_host(
 
 engine.bind_input("flow_vector", tensor);
 engine.forward();
-```
 ```
 

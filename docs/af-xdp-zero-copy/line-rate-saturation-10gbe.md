@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/af-xdp-zero-copy/line-rate-saturation-10gbe.md`
-
-```markdown
 # 10GbE Line-Rate Saturation: 1.25M+ Events per Second
 
 Achieving sustained line-rate packet ingestion at $10\text{ GbE}$ ($14.88\text{ Mpps}$ for 64-byte packets) requires tuning the Linux network stack, kernel scheduler, and NIC descriptor rings.
@@ -64,5 +59,4 @@ Packets/Sec (Mpps)
 
 * **CPU Core Usage:** $< 8\%$ on a single isolated Intel Xeon core running the XDP driver loop.
 * **Kernel Memory Impact:** $0$ socket buffer allocation faults.
-```
 

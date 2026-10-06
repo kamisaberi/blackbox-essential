@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/af-xdp-zero-copy/multi-core-rss-queues.md`
-
-```markdown
 # Scaling Across Multi-Queue NICs via Receive Side Scaling (RSS)
 
 Enterprise network adapters feature multiple hardware receive queues (typically 4, 8, 16, or 64 queues). To scale packet ingestion across multiple CPU cores, `blackbox-essential` pairs **Receive Side Scaling (RSS)** with multi-socket AF_XDP bindings.
@@ -81,5 +76,4 @@ void run_multiqueue_service(const std::string& interface_name, uint32_t num_queu
 | **4 Queues** | 4 Cores | $5.65\text{ Mpps}$ |
 | **8 Queues** | 8 Cores | $11.20\text{ Mpps}$ |
 | **16 Queues** | 16 Cores | **$14.88\text{ Mpps}$ (10GbE Line Rate)** |
-```
 

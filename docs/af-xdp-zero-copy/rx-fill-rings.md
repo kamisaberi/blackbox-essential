@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/af-xdp-zero-copy/rx-fill-rings.md`
-
-```markdown
 # Coordinating Descriptor Exchanges: The 4 AF_XDP Rings
 
 AF_XDP coordinates memory handoffs between the kernel driver and user space using **four lock-free circular ring buffers**:
@@ -98,5 +93,4 @@ void process_ingress_packets(
 ## 3. Wakeup Flag Optimization (`XSK_RING_NEED_WAKEUP`)
 
 When `XSK_UMEM__USES_NEED_WAKEUP` is active, the kernel driver sets the `NEED_WAKEUP` flag on the Fill or Tx rings when its internal queues stall. User space checks this flag and calls `poll()` or `sendto()` only when necessary, eliminating redundant system call overhead.
-```
 
