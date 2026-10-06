@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/tier2-virtual-tpm.md`
-
-```markdown
 # Tier 2 Identity: Virtual TPM (vTPM / swtpm)
 
 When deployed in virtualized enterprise datacenters or cloud environments (such as **VMware vSphere/ESXi, KVM/QEMU, or Microsoft Hyper-V**), physical discrete TPMs are typically inaccessible. `blackbox-essential` detects and interfaces with the hypervisor-provided **Virtual TPM (vTPM)**.
@@ -50,5 +45,4 @@ In VMware vSphere environments, the vTPM state is stored within the virtual mach
 * **Certificate Authority:** vTPM Endorsement Key certificates are signed by the virtualization platform's internal CA rather than a physical semiconductor manufacturer (e.g., Infineon).
 * **PCR Validity:** PCR 0 measures the virtual BIOS (VMware EFI), while PCR 4 measures the virtualized bootloader.
 * **Hypervisor Attestation Binding:** `blackbox-essential` pairs the vTPM quote with VMware Guest RPC queries (`vmware-rpctool`) to verify the virtual machine UUID assigned by vCenter.
-```
 

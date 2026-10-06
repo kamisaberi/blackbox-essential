@@ -1,12 +1,3 @@
-### Part 5: Hardware Identity & Cryptographic TPM Attestation (`hardware-identity-tpm/*`)
-
-This section contains 7 architectural and technical implementation files for the silicon-rooted identity engine of `blackbox-essential`: the multi-tier attestation architecture, physical TPM 2.0 TSS2 interactions, PCR measurements and quotes, virtual TPM handling, DMI fallback, anti-cloning defenses, and the remote quote verification protocol.
-
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/attestation-architecture.md`
-
-```markdown
 # Hardware Attestation Architecture: Why Software Identities Fail
 
 In hostile or zero-trust deployment environments (such as remote substations, offshore wind turbines, or public cloud edge nodes), software-only credentials—such as API tokens, hardcoded UUIDs, or filesystem-stored TLS private keys—fail to provide secure device identity.
@@ -64,5 +55,4 @@ CONVENTIONAL SOFTWARE IDENTITY (Vulnerable to Replication & Theft):
 1. **Non-Extractable Keys:** The private Endorsement Key (EK) and Attestation Identity Key (AIK) never leave the physical TPM silicon boundary in plaintext.
 2. **Freshness via External Nonce:** Cryptographic quotes incorporate a 32-byte single-use cryptographic nonce issued by the fleet orchestrator (`sentinel-nexus`), eliminating replay attacks.
 3. **State Sealing:** Model weights and local decryption keys are cryptographically sealed to specific Platform Configuration Register values (PCR 0 and PCR 4). If the bootloader or UEFI firmware is modified, the TPM refuses to unseal the secrets.
-```
 

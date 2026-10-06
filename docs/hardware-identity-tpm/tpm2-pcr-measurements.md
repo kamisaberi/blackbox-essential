@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/tpm2-pcr-measurements.md`
-
-```markdown
 # Generating Cryptographic Quotes over PCR 0 and PCR 4
 
 A **TPM2 Quote** is a cryptographically signed statement produced by the TPM that certifies the current contents of its Platform Configuration Registers (PCRs) alongside an external freshness nonce.
@@ -104,5 +99,4 @@ The fleet command server validates the quote:
 1. Re-computes the SHA-256 hash of the baseline golden PCR 0 and PCR 4 values.
 2. Checks that `attest->extraData` exactly matches the originally issued nonce.
 3. Validates the RSA/ECC digital signature using the device's public AIK certificate.
-```
 

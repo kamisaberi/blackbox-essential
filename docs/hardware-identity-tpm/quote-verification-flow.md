@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/quote-verification-flow.md`
-
-```markdown
 # Attestation Identity Key (AIK) Signature Validation Protocol
 
 This document details the complete cryptographic verification handshake executed between an edge appliance (`blackbox-essential`) and the fleet command plane (`sentinel-nexus`).
@@ -89,31 +84,3 @@ bool verify_appliance_quote(
 * **Hashing Function:** SHA-256.
 * **Nonce Length:** Exactly 32 bytes ($256\text{ bits}$) generated via a cryptographically secure pseudorandom number generator (`/dev/urandom`).
 * **Handshake SLA:** The complete generation and verification cycle executes in **$< 48\,\text{ms}$**.
-```
-
----
-
-### Complete in Part 5
-- `blackbox-essential/docs/hardware-identity-tpm/attestation-architecture.md`
-- `blackbox-essential/docs/hardware-identity-tpm/tier1-physical-tpm2.md`
-- `blackbox-essential/docs/hardware-identity-tpm/tpm2-pcr-measurements.md`
-- `blackbox-essential/docs/hardware-identity-tpm/tier2-virtual-tpm.md`
-- `blackbox-essential/docs/hardware-identity-tpm/tier3-dmi-fallback.md`
-- `blackbox-essential/docs/hardware-identity-tpm/anti-cloning-protections.md`
-- `blackbox-essential/docs/hardware-identity-tpm/quote-verification-flow.md`
-
-All 7 hardware identity and TPM attestation files are now generated.
-
----
-
-### Files to be Generated in Part 6
-
-The next phase covers **High-Throughput User-Space Networking via AF_XDP Zero-Copy** (`af-xdp-zero-copy/`):
-
-1. `af-xdp-zero-copy/umem-architecture.md` (Packet buffer ring allocation in unified user-memory)
-2. `af-xdp-zero-copy/rx-fill-rings.md` (Coordinating descriptor exchanges between NIC and userspace)
-3. `af-xdp-zero-copy/zero-copy-packet-transfer.md` (Zero-copy DMA transfers from NIC directly to inference memory)
-4. `af-xdp-zero-copy/line-rate-saturation-10gbe.md` (Pushing 1.25M+ events/sec on Intel X520 and E810 adapters)
-5. `af-xdp-zero-copy/multi-core-rss-queues.md` (Scaling across multi-queue NICs using Receive Side Scaling)
-
-Confirm when you are ready to proceed with Part 6.

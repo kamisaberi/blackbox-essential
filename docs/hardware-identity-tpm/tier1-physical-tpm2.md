@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/tier1-physical-tpm2.md`
-
-```markdown
 # Tier 1 Identity: Physical TPM 2.0 Interface (`/dev/tpmrm0`)
 
 Tier 1 attestation interfaces directly with physical discrete or firmware TPM 2.0 silicon (such as Infineon OPTIGA, STMicroelectronics ST33, or Intel PTT) via the Linux TPM Resource Manager device (`/dev/tpmrm0`) and the TCG TSS2 Enhanced System API (`libtss2-esys`).
@@ -127,6 +122,5 @@ ESYS_TR create_endorsement_key(ESYS_CONTEXT* ctx) {
 
     return ek_handle;
 }
-```
 ```
 

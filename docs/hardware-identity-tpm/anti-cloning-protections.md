@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/anti-cloning-protections.md`
-
-```markdown
 # Anti-Cloning Defenses & Rogue Node Revocation
 
 Virtualization and containerization make it easy for adversaries to duplicate active appliance disk images and spin up unauthorized, parallel clones to conduct side-channel attacks or bypass collective defense quotas.
@@ -57,6 +52,5 @@ On VMware and KVM, the engine verifies the hypervisor's runtime UUID against cac
  └───────────────┘                 └───────────────┘
  Clears in-memory keys;            Commands xdp_filter.o to drop
  zeroizes model weights.           ALL network frames (Fail-Secure).
-```
 ```
 

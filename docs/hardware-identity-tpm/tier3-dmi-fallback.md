@@ -1,8 +1,3 @@
----
-
-### File: `blackbox-essential/docs/hardware-identity-tpm/tier3-dmi-fallback.md`
-
-```markdown
 # Tier 3 Identity: DMI UUID & Machine-ID Fallback
 
 For legacy industrial edge gateways, DIN-rail automation PCs (e.g., legacy Advantech, Moxa, or Siemens IPCs), and micro-embedded ARM boards lacking hardware TPM chips, `blackbox-essential` falls back to **Tier 3 Deterministic DMI Hashing**.
@@ -93,5 +88,4 @@ std::string generate_tier3_identity() {
 When an appliance operates in Tier 3 mode:
 * The fleet command plane (`sentinel-nexus`) flags the node as **`UNATTESTED_HARDWARE`**.
 * Model retraining pipelines (`xinfer-forge`) refuse to ingest active-learning vectors from Tier 3 nodes to prevent **adversarial data poisoning**.
-```
 
