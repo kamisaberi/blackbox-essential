@@ -112,3 +112,24 @@ endif()
 # Installation Rules
 install(TARGETS blackbox DESTINATION /usr/local/lib)
 install(DIRECTORY include/blackbox DESTINATION /usr/local/include)
+
+
+
+# -------------------------------------------------------------------
+# AF_XDP EXAMPLES & BENCHMARKS
+# -------------------------------------------------------------------
+add_executable(test_af_xdp examples/test_af_xdp.cpp)
+target_link_libraries(test_af_xdp PRIVATE
+    blackbox::blackbox
+    ${XDP_LIB}
+    bpf
+    Threads::Threads
+)
+
+add_executable(test_af_xdp_live examples/test_af_xdp_live.cpp)
+target_link_libraries(test_af_xdp_live PRIVATE
+    blackbox::blackbox
+    ${XDP_LIB}
+    bpf
+    Threads::Threads
+)
