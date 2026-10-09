@@ -18,14 +18,15 @@
 
 namespace blackbox::ingest {
 
-struct xsk_umem_info {
+// Complete type definitions defined before constructor
+struct UmemContext {
     struct xsk_ring_prod fq;
     struct xsk_ring_cons cq;
     struct xsk_umem*     umem{nullptr};
     void*                buffer{nullptr};
 };
 
-struct xsk_socket_info {
+struct SocketContext {
     struct xsk_ring_cons rx;
     struct xsk_ring_prod tx;
     struct xsk_socket*   xsk{nullptr};
@@ -49,7 +50,7 @@ bool AfXdpEngine::allocate_umem() {
         return false;
     }
 
-    umem_info_ = std::make_unique<xsk_umem_info>();
+    umem_info_ = std::make_unique<UmemContext>();
     umem_info_->buffer = umem_buffer_;
 
     struct xsk_umem_config u_cfg{};
@@ -86,7 +87,7 @@ bool AfXdpEngine::allocate_umem() {
 }
 
 bool AfXdpEngine::setup_xsk_socket(bool attempt_zero_copy) {
-    xsk_info_ = std::make_unique<xsk_socket_info>();
+    xsk_info_ = std::make_unique<SocketContext>();
 
     struct xsk_socket_config x_cfg{};
     x_cfg.rx_size = XSK_RING_CONS__DEFAULT_NUM_DESCS;
