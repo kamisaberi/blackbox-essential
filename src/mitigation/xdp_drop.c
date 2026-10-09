@@ -5,14 +5,21 @@
 
 #define ETH_P_IP 0x0800
 
-// BPF Hash Map storing blocked IPv4 addresses (Key: IPv4 as u32, Value: Hit counter as u64)
-// BTF-defined map layout
+// 1. In-Kernel Drop Map (IPv4 -> Hit Counter)
 struct {
     __uint(type, BPF_MAP_TYPE_HASH);
     __uint(max_entries, 65536);
     __type(key, __u32);
     __type(value, __u64);
 } blocked_ip_map SEC(".maps");
+
+// 2. AF_XDP Sockets Redirection Map (Rx Queue Index -> XSK Socket FD)
+struct {
+    __uint(type, BPF_MAP_TYPE_XSKMAP);
+    __uint(max_entries, 64);
+    __type(key, __u32);
+    __type(value, __u32);
+} xsks_map SEC(".maps");
 
 SEC("xdp")
 int xdp_firewall(struct xdp_md *ctx) {
@@ -34,14 +41,16 @@ int xdp_firewall(struct xdp_md *ctx) {
 
     __u32 src_ip = ip->saddr;
 
-    // Direct sub-microsecond lookup in kernel BPF map
+    // Fast-path: Check blocked list
     __u64 *drop_counter = bpf_map_lookup_elem(&blocked_ip_map, &src_ip);
     if (drop_counter) {
         __sync_fetch_and_add(drop_counter, 1);
-        return XDP_DROP; // In-kernel line-rate driver drop (< 0.84 µs)
+        return XDP_DROP; // Wire-speed nanosecond kernel drop (< 0.84 µs)
     }
 
-    return XDP_PASS;
+    // Pass-path: Redirect directly into AF_XDP UMEM Ring for userspace processing
+    // Falls back to standard XDP_PASS if userspace socket is not active on this queue
+    return bpf_redirect_map(&xsks_map, ctx->rx_queue_index, XDP_PASS);
 }
 
 char _license[] SEC("license") = "GPL";
