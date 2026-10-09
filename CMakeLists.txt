@@ -29,6 +29,17 @@ find_package(OpenSSL REQUIRED)
 find_library(XINFER_LIB xinfer REQUIRED PATHS /usr/local/lib /usr/lib)
 find_library(SQLITE3_LIB sqlite3 REQUIRED)
 
+
+# --- AF_XDP LINKING (libxdp) ---
+find_library(XDP_LIB xdp PATHS /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu REQUIRED)
+
+# --- OPENVINO RUNTIME INTEGRATION (OPTIONAL / AUTO-DETECT) ---
+find_package(OpenVINO QUIET)
+if(OpenVINO_FOUND)
+    message(STATUS "[blackbox] OpenVINO found: ${OpenVINO_VERSION}")
+    include_directories(${OpenVINO_INCLUDE_DIRS})
+endif()
+
 set(LIBBLACKBOX_SOURCES
     src/engine_instance.cpp
     src/hardware/hardware_identity.cpp
@@ -62,11 +73,18 @@ target_link_libraries(blackbox PUBLIC
     bpf
     elf
     z
+    ${XDP_LIB}
     Threads::Threads
     ${XINFER_LIB}
     ${SQLITE3_LIB}
     OpenSSL::Crypto
 )
+
+
+# Attach OpenVINO runtime if detected
+if(OpenVINO_FOUND)
+    target_link_libraries(blackbox PUBLIC openvino::runtime)
+endif()
 
 set_target_properties(blackbox PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -82,6 +100,8 @@ target_link_libraries(blackbox_daemon PRIVATE
     blackbox::blackbox 
     bpf 
     elf
+    ${XDP_LIB}
+
 )
 
 if(BLACKBOX_BUILD_TESTS)
