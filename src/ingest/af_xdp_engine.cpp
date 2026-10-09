@@ -96,7 +96,7 @@ bool AfXdpEngine::setup_xsk_socket(bool attempt_zero_copy) {
     x_cfg.libbpf_flags = XSK_LIBBPF_FLAGS__INHIBIT_PROG_LOAD;
 
     if (attempt_zero_copy) {
-        x_cfg.bind_flags = XDP_ZERO_COPY;
+        x_cfg.bind_flags = XDP_ZEROCOPY;
         x_cfg.xdp_flags  = XDP_FLAGS_DRV_MODE;
     } else {
         // Safe VMware / Docker fallback mode: Generic SKB + Copy Mode
