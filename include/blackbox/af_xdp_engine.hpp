@@ -7,13 +7,11 @@
 #include <functional>
 #include <memory>
 
-// Forward declarations for opaque XSK structures
-struct xsk_umem_info;
-struct xsk_socket_info;
-struct xsk_ring_cons;
-struct xsk_ring_prod;
-
 namespace blackbox::ingest {
+
+// Forward declarations inside blackbox::ingest namespace
+struct UmemContext;
+struct SocketContext;
 
 struct AfXdpConfig {
     std::string interface_name{"eth0"};
@@ -40,7 +38,7 @@ public:
     /// Stop rings and release UMEM
     void stop();
 
-    /// Poll and process a batch of frames from Rx ring (called in high-speed loop)
+    /// Poll and process a batch of frames from Rx ring
     uint32_t poll_batch(uint32_t max_batch, PacketHandler handler);
 
     [[nodiscard]] bool is_zero_copy_active() const { return zero_copy_active_; }
@@ -60,8 +58,8 @@ private:
     void*  umem_buffer_{nullptr};
     size_t umem_size_{0};
 
-    std::unique_ptr<xsk_umem_info>   umem_info_;
-    std::unique_ptr<xsk_socket_info> xsk_info_;
+    std::unique_ptr<UmemContext>   umem_info_;
+    std::unique_ptr<SocketContext> xsk_info_;
 
     std::atomic<uint64_t> total_packets_{0};
 };
