@@ -47,6 +47,7 @@ set(LIBBLACKBOX_SOURCES
     src/ingest/vision_ingest.cpp
     src/api/http_server.cpp
     src/api/websocket.cpp
+    src/ingest/af_xdp_engine.cpp
 )
 
 # -------------------------------------------------------------------
