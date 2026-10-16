@@ -7,17 +7,15 @@
 #include <functional>
 #include <memory>
 
-
 // Required for public symbol export under -fvisibility=hidden
 #include "blackbox/export.hpp"
 
 namespace blackbox::ingest {
 
-// Forward declarations inside blackbox::ingest namespace
 struct UmemContext;
 struct SocketContext;
 
-struct AfXdpConfig {
+struct BLACKBOX_API AfXdpConfig {
     std::string interface_name{"eth0"};
     uint32_t    queue_id{0};
     uint32_t    num_frames{4096};
@@ -28,7 +26,7 @@ struct AfXdpConfig {
 // Callback invoked per packet without heap allocation: (packet_data, packet_len)
 using PacketHandler = std::function<void(const uint8_t* data, size_t len)>;
 
-class AfXdpEngine {
+class BLACKBOX_API AfXdpEngine {
 public:
     explicit AfXdpEngine(AfXdpConfig config);
     ~AfXdpEngine();
