@@ -9,11 +9,6 @@
 #include <filesystem>
 #include <vector>
 
-
-
-
-
-
 namespace blackbox::mitigation
 {
 
@@ -41,10 +36,36 @@ namespace blackbox::mitigation
         if (ifindex_ == 0)
             return false;
 
-        struct bpf_object *obj = bpf_object__open_file(bpf_obj_path.c_str(), nullptr);
+        // Smart Multi-Path Resolution (handles running from root, build/, or system install)
+        std::vector<std::string> search_paths = {
+            bpf_obj_path,
+            "../" + bpf_obj_path,
+            "/home/kami/blackbox-essential/src/mitigation/xdp_drop.o",
+            "/usr/local/lib/blackbox/xdp_drop.o",
+            "/etc/sentinel/xdp_drop.o"};
+
+        std::string resolved_path = bpf_obj_path;
+        bool found = false;
+        for (const auto &p : search_paths)
+        {
+            if (std::filesystem::exists(p))
+            {
+                resolved_path = p;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            std::cerr << "[eBPF Blocker] Error: xdp_drop.o not found in any standard path." << std::endl;
+            return false;
+        }
+
+        struct bpf_object *obj = bpf_object__open_file(resolved_path.c_str(), nullptr);
         if (!obj)
         {
-            std::cerr << "[eBPF Blocker] Failed to open BPF object: " << bpf_obj_path << std::endl;
+            std::cerr << "[eBPF Blocker] Failed to open BPF object: " << resolved_path << std::endl;
             return false;
         }
 
@@ -58,8 +79,6 @@ namespace blackbox::mitigation
         struct bpf_program *prog = bpf_object__find_program_by_name(obj, "xdp_firewall");
         prog_fd_ = bpf_program__fd(prog);
         map_fd_ = bpf_object__find_map_fd_by_name(obj, "blocked_ip_map");
-
-        // Resolve xsks_map for AF_XDP redirection
         xsks_map_fd_ = bpf_object__find_map_fd_by_name(obj, "xsks_map");
         bpf_obj_ = obj;
 
@@ -71,7 +90,7 @@ namespace blackbox::mitigation
             return false;
         }
 
-        std::cout << "[eBPF Kernel Driver] Attached native XDP filter to: "
+        std::cout << "[eBPF Kernel Driver] Attached native XDP filter (" << resolved_path << ") to: "
                   << interface_name_ << " (SKB Mode active)." << std::endl;
         return true;
     }
