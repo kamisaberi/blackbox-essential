@@ -7,6 +7,10 @@
 #include <functional>
 #include <memory>
 
+
+// Required for public symbol export under -fvisibility=hidden
+#include "blackbox/export.hpp"
+
 namespace blackbox::ingest {
 
 // Forward declarations inside blackbox::ingest namespace
