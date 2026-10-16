@@ -118,7 +118,7 @@ install(DIRECTORY include/blackbox DESTINATION /usr/local/include)
 # -------------------------------------------------------------------
 # AF_XDP EXAMPLES & BENCHMARKS
 # -------------------------------------------------------------------
-add_executable(test_af_xdp examples/test_af_xdp.cpp)
+add_executable(test_af_xdp examples/test_af_xdp.cpp src/ingest/af_xdp_engine.cpp)
 target_link_libraries(test_af_xdp PRIVATE
     blackbox::blackbox
     ${XDP_LIB}
@@ -126,7 +126,7 @@ target_link_libraries(test_af_xdp PRIVATE
     Threads::Threads
 )
 
-add_executable(test_af_xdp_live examples/test_af_xdp_live.cpp)
+add_executable(test_af_xdp_live examples/test_af_xdp_live.cpp src/ingest/af_xdp_engine.cpp)
 target_link_libraries(test_af_xdp_live PRIVATE
     blackbox::blackbox
     ${XDP_LIB}
