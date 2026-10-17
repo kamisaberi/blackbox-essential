@@ -1,0 +1,25 @@
+{
+    "engine_name": "Blackbox-Essential Ingestion Core",
+    "version": "1.0.0",
+    "network": {
+        "interface_name": "ens160",
+        "queue_ids": [
+            0
+        ],
+        "bind_mode": "AUTO_DETECT",
+        "vmware_skb_fallback": true
+    },
+    "umem_pool": {
+        "frame_size": 4096,
+        "frame_count": 4096,
+        "frame_headroom": 0,
+        "fill_ring_size": 2048,
+        "completion_ring_size": 2048,
+        "rx_ring_size": 2048,
+        "tx_ring_size": 2048
+    },
+    "ebpf_maps": {
+        "blocked_ip_map_capacity": 65536,
+        "xsks_map_capacity": 64
+    }
+}
