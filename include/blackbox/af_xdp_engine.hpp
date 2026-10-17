@@ -10,60 +10,66 @@
 // Required for public symbol export under -fvisibility=hidden
 #include "blackbox/export.hpp"
 
-namespace blackbox::ingest {
+namespace blackbox::ingest
+{
 
-struct UmemContext;
-struct SocketContext;
+    struct UmemContext;
+    struct SocketContext;
 
-struct BLACKBOX_API AfXdpConfig {
-    std::string interface_name{"eth0"};
-    uint32_t    queue_id{0};
-    uint32_t    num_frames{4096};
-    uint32_t    frame_size{2048};
-    bool        force_copy_mode{false}; // True for VMware/Docker virtual interfaces
-};
+    struct BLACKBOX_API AfXdpConfig
+    {
+        std::string interface_name{"ens160"};
+        uint32_t queue_id{0};
+        uint32_t num_frames{4096};
+        uint32_t frame_size{4096};
+        bool force_copy_mode{true}; // True for VMware/Docker virtual interfaces
 
-// Callback invoked per packet without heap allocation: (packet_data, packet_len)
-using PacketHandler = std::function<void(const uint8_t* data, size_t len)>;
+        /// Load dynamic engine configuration from JSON file
+        static AfXdpConfig load_from_json(const std::string &json_path);
+    };
 
-class BLACKBOX_API AfXdpEngine {
-public:
-    explicit AfXdpEngine(AfXdpConfig config);
-    ~AfXdpEngine();
+    // Callback invoked per packet without heap allocation: (packet_data, packet_len)
+    using PacketHandler = std::function<void(const uint8_t *data, size_t len)>;
 
-    AfXdpEngine(const AfXdpEngine&) = delete;
-    AfXdpEngine& operator=(const AfXdpEngine&) = delete;
+    class BLACKBOX_API AfXdpEngine
+    {
+    public:
+        explicit AfXdpEngine(AfXdpConfig config);
+        ~AfXdpEngine();
 
-    /// Initialize UMEM memory pool, configure rings, and bind AF_XDP socket
-    bool start();
+        AfXdpEngine(const AfXdpEngine &) = delete;
+        AfXdpEngine &operator=(const AfXdpEngine &) = delete;
 
-    /// Stop rings and release UMEM
-    void stop();
+        /// Initialize UMEM memory pool, configure rings, and bind AF_XDP socket
+        bool start();
 
-    /// Poll and process a batch of frames from Rx ring
-    uint32_t poll_batch(uint32_t max_batch, PacketHandler handler);
+        /// Stop rings and release UMEM
+        void stop();
 
-    [[nodiscard]] bool is_zero_copy_active() const { return zero_copy_active_; }
-    [[nodiscard]] bool is_running() const { return running_.load(); }
-    [[nodiscard]] uint64_t total_packets_received() const { return total_packets_.load(); }
-    [[nodiscard]] int get_xsk_fd() const;
+        /// Poll and process a batch of frames from Rx ring
+        uint32_t poll_batch(uint32_t max_batch, PacketHandler handler);
 
-private:
-    bool allocate_umem();
-    bool setup_xsk_socket(bool attempt_zero_copy);
+        [[nodiscard]] bool is_zero_copy_active() const { return zero_copy_active_; }
+        [[nodiscard]] bool is_running() const { return running_.load(); }
+        [[nodiscard]] uint64_t total_packets_received() const { return total_packets_.load(); }
+        [[nodiscard]] int get_xsk_fd() const;
 
-    AfXdpConfig config_;
-    std::atomic<bool> running_{false};
-    bool zero_copy_active_{false};
+    private:
+        bool allocate_umem();
+        bool setup_xsk_socket(bool attempt_zero_copy);
 
-    // UMEM & Rings internal state
-    void*  umem_buffer_{nullptr};
-    size_t umem_size_{0};
+        AfXdpConfig config_;
+        std::atomic<bool> running_{false};
+        bool zero_copy_active_{false};
 
-    std::unique_ptr<UmemContext>   umem_info_;
-    std::unique_ptr<SocketContext> xsk_info_;
+        // UMEM & Rings internal state
+        void *umem_buffer_{nullptr};
+        size_t umem_size_{0};
 
-    std::atomic<uint64_t> total_packets_{0};
-};
+        std::unique_ptr<UmemContext> umem_info_;
+        std::unique_ptr<SocketContext> xsk_info_;
+
+        std::atomic<uint64_t> total_packets_{0};
+    };
 
 } // namespace blackbox::ingest
