@@ -15,12 +15,21 @@ namespace blackbox::mitigation
     EBPFBlocker::EBPFBlocker(std::string interface_name)
         : interface_name_(std::move(interface_name))
     {
+        // Dynamic interface resolution (ens160, ens33, ens192, eth0)
         ifindex_ = if_nametoindex(interface_name_.c_str());
         if (ifindex_ == 0)
         {
-            ifindex_ = if_nametoindex("eth0");
-            if (ifindex_ != 0)
-                interface_name_ = "eth0";
+            std::vector<std::string> fallbacks = {"ens160", "ens33", "eth0", "lo"};
+            for (const auto &iface : fallbacks)
+            {
+                int idx = if_nametoindex(iface.c_str());
+                if (idx != 0)
+                {
+                    ifindex_ = idx;
+                    interface_name_ = iface;
+                    break;
+                }
+            }
         }
 
         attach_xdp_program("src/mitigation/xdp_drop.o");
