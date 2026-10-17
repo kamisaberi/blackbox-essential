@@ -1,5 +1,7 @@
 #include "blackbox/af_xdp_engine.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <cstring>
 #include <cstdlib>
 #include <unistd.h>
@@ -17,6 +19,53 @@
 #endif
 
 namespace blackbox::ingest {
+
+AfXdpConfig AfXdpConfig::load_from_json(const std::string& json_path) {
+    AfXdpConfig cfg{};
+    std::ifstream file(json_path);
+    if (!file.is_open()) {
+        std::cout << "[!] [AF_XDP Config] Config file not found at " << json_path 
+                  << ". Using VMware defaults (ens160, Q0, XDP_COPY)." << std::endl;
+        return cfg;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.find("interface_name") != std::string::npos) {
+            auto pos = line.find(':');
+            if (pos != std::string::npos) {
+                std::string val = line.substr(pos + 1);
+                auto start = val.find_first_of("\"");
+                auto end = val.find_last_of("\"");
+                if (start != std::string::npos && end != std::string::npos && end > start) {
+                    cfg.interface_name = val.substr(start + 1, end - start - 1);
+                }
+            }
+        } else if (line.find("frame_size") != std::string::npos) {
+            auto pos = line.find(':');
+            if (pos != std::string::npos) {
+                try { cfg.frame_size = std::stoul(line.substr(pos + 1)); } catch (...) {}
+            }
+        } else if (line.find("frame_count") != std::string::npos) {
+            auto pos = line.find(':');
+            if (pos != std::string::npos) {
+                try { cfg.num_frames = std::stoul(line.substr(pos + 1)); } catch (...) {}
+            }
+        } else if (line.find("vmware_skb_fallback") != std::string::npos || line.find("force_copy_mode") != std::string::npos) {
+            if (line.find("true") != std::string::npos) {
+                cfg.force_copy_mode = true;
+            } else if (line.find("false") != std::string::npos) {
+                cfg.force_copy_mode = false;
+            }
+        }
+    }
+
+    std::cout << "[+] [AF_XDP Config] Loaded dynamic JSON config: Interface=" << cfg.interface_name
+              << " | Queue=" << cfg.queue_id << " | FrameSize=" << cfg.frame_size 
+              << " | ForceCopy=" << (cfg.force_copy_mode ? "true" : "false") << std::endl;
+
+    return cfg;
+}
 
 // Complete type definitions defined before constructor
 struct UmemContext {
