@@ -24,31 +24,73 @@ namespace blackbox::ingest
     AfXdpConfig AfXdpConfig::load_from_json(const std::string &json_path)
     {
         AfXdpConfig cfg{};
-        std::ifstream file(json_path);
+
+        // Multi-path search so binary finds the config file regardless of launch directory
+        std::vector<std::string> search_paths = {
+            json_path,
+            "configs/af_xdp_config.json",
+            "../configs/af_xdp_config.json",
+            "blackbox-essential/configs/af_xdp_config.json",
+            "/etc/sentinel/af_xdp_config.json"};
+
+        std::ifstream file;
+        std::string resolved_path;
+        for (const auto &path : search_paths)
+        {
+            file.open(path);
+            if (file.is_open())
+            {
+                resolved_path = path;
+                break;
+            }
+        }
+
         if (!file.is_open())
         {
             std::cout << "[!] [AF_XDP Config] Config file not found at " << json_path
-                      << ". Using VMware defaults (ens160, Q0, XDP_COPY)." << std::endl;
+                      << ". Using VMware default fallback settings (ens160, Q0, XDP_COPY)." << std::endl;
             return cfg;
         }
 
         std::string line;
         while (std::getline(file, line))
         {
+            // 1. Parse interface_name
             if (line.find("interface_name") != std::string::npos)
+            {
+                auto pos = line.find("interface_name");
+                auto first_q = line.find('"', pos + 14);
+                if (first_q != std::string::npos)
+                {
+                    auto second_q = line.find('"', first_q + 1);
+                    if (second_q != std::string::npos)
+                    {
+                        cfg.interface_name = line.substr(first_q + 1, second_q - first_q - 1);
+                    }
+                }
+            }
+            // 2. Parse queue_id / queue_ids
+            else if (line.find("queue_id") != std::string::npos || line.find("queue_ids") != std::string::npos)
             {
                 auto pos = line.find(':');
                 if (pos != std::string::npos)
                 {
                     std::string val = line.substr(pos + 1);
-                    auto start = val.find_first_of("\"");
-                    auto end = val.find_last_of("\"");
-                    if (start != std::string::npos && end != std::string::npos && end > start)
+                    for (char &c : val)
                     {
-                        cfg.interface_name = val.substr(start + 1, end - start - 1);
+                        if (c == '[' || c == ']' || c == ',')
+                            c = ' ';
+                    }
+                    try
+                    {
+                        cfg.queue_id = std::stoul(val);
+                    }
+                    catch (...)
+                    {
                     }
                 }
             }
+            // 3. Parse frame_size
             else if (line.find("frame_size") != std::string::npos)
             {
                 auto pos = line.find(':');
@@ -63,7 +105,8 @@ namespace blackbox::ingest
                     }
                 }
             }
-            else if (line.find("frame_count") != std::string::npos)
+            // 4. Parse frame_count / num_frames
+            else if (line.find("frame_count") != std::string::npos || line.find("num_frames") != std::string::npos)
             {
                 auto pos = line.find(':');
                 if (pos != std::string::npos)
@@ -77,6 +120,7 @@ namespace blackbox::ingest
                     }
                 }
             }
+            // 5. Parse force_copy_mode / vmware_skb_fallback
             else if (line.find("vmware_skb_fallback") != std::string::npos || line.find("force_copy_mode") != std::string::npos)
             {
                 if (line.find("true") != std::string::npos)
@@ -90,13 +134,14 @@ namespace blackbox::ingest
             }
         }
 
-        std::cout << "[+] [AF_XDP Config] Loaded dynamic JSON config: Interface=" << cfg.interface_name
-                  << " | Queue=" << cfg.queue_id << " | FrameSize=" << cfg.frame_size
+        std::cout << "[+] [AF_XDP Config] Successfully loaded config from " << resolved_path
+                  << ": Interface=" << cfg.interface_name
+                  << " | Queue=" << cfg.queue_id
+                  << " | FrameSize=" << cfg.frame_size
                   << " | ForceCopy=" << (cfg.force_copy_mode ? "true" : "false") << std::endl;
 
         return cfg;
     }
-
     // Complete type definitions defined before constructor
     struct UmemContext
     {
