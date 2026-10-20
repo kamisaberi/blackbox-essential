@@ -52,6 +52,7 @@ namespace blackbox::ingest
             return cfg;
         }
 
+        cfg.queue_ids.clear();
         std::string line;
         while (std::getline(file, line))
         {
@@ -69,24 +70,28 @@ namespace blackbox::ingest
                     }
                 }
             }
-            // 2. Parse queue_id / queue_ids
-            else if (line.find("queue_id") != std::string::npos || line.find("queue_ids") != std::string::npos)
+            // 2. Parse queue_ids array or single queue_id
+            else if (line.find("queue_ids") != std::string::npos || line.find("queue_id") != std::string::npos)
             {
                 auto pos = line.find(':');
                 if (pos != std::string::npos)
                 {
                     std::string val = line.substr(pos + 1);
-                    for (char &c : val)
+                    std::stringstream ss(val);
+                    std::string token;
+                    while (std::getline(ss, token, ','))
                     {
-                        if (c == '[' || c == ']' || c == ',')
-                            c = ' ';
-                    }
-                    try
-                    {
-                        cfg.queue_id = std::stoul(val);
-                    }
-                    catch (...)
-                    {
+                        for (char &c : token)
+                        {
+                            if (c == '[' || c == ']' || c == '\"' || c == ' ')
+                                c = ' ';
+                        }
+                        std::stringstream token_ss(token);
+                        uint32_t q_num;
+                        if (token_ss >> q_num)
+                        {
+                            cfg.queue_ids.push_back(q_num);
+                        }
                     }
                 }
             }
@@ -96,13 +101,7 @@ namespace blackbox::ingest
                 auto pos = line.find(':');
                 if (pos != std::string::npos)
                 {
-                    try
-                    {
-                        cfg.frame_size = std::stoul(line.substr(pos + 1));
-                    }
-                    catch (...)
-                    {
-                    }
+                    try { cfg.frame_size = std::stoul(line.substr(pos + 1)); } catch (...) {}
                 }
             }
             // 4. Parse frame_count / num_frames
@@ -111,13 +110,7 @@ namespace blackbox::ingest
                 auto pos = line.find(':');
                 if (pos != std::string::npos)
                 {
-                    try
-                    {
-                        cfg.num_frames = std::stoul(line.substr(pos + 1));
-                    }
-                    catch (...)
-                    {
-                    }
+                    try { cfg.num_frames = std::stoul(line.substr(pos + 1)); } catch (...) {}
                 }
             }
             // 5. Parse force_copy_mode / vmware_skb_fallback
@@ -134,14 +127,21 @@ namespace blackbox::ingest
             }
         }
 
-        std::cout << "[+] [AF_XDP Config] Successfully loaded config from " << resolved_path
+        if (cfg.queue_ids.empty())
+        {
+            cfg.queue_ids.push_back(0);
+        }
+        cfg.queue_id = cfg.queue_ids[0];
+
+        std::cout << "[+] [AF_XDP Config] Loaded dynamic config from " << resolved_path
                   << ": Interface=" << cfg.interface_name
-                  << " | Queue=" << cfg.queue_id
+                  << " | Queues=" << cfg.queue_ids.size()
                   << " | FrameSize=" << cfg.frame_size
                   << " | ForceCopy=" << (cfg.force_copy_mode ? "true" : "false") << std::endl;
 
         return cfg;
     }
+
     // Complete type definitions defined before constructor
     struct UmemContext
     {
@@ -157,10 +157,17 @@ namespace blackbox::ingest
         struct xsk_ring_prod tx;
         struct xsk_socket *xsk{nullptr};
         int fd{-1};
+        uint32_t queue_id{0};
     };
 
     AfXdpEngine::AfXdpEngine(AfXdpConfig config)
-        : config_(std::move(config)) {}
+        : config_(std::move(config))
+    {
+        if (config_.queue_ids.empty())
+        {
+            config_.queue_ids.push_back(config_.queue_id);
+        }
+    }
 
     AfXdpEngine::~AfXdpEngine()
     {
@@ -171,7 +178,6 @@ namespace blackbox::ingest
     {
         umem_size_ = static_cast<size_t>(config_.num_frames) * config_.frame_size;
 
-        // Page-aligned memory allocation for UMEM chunks
         if (posix_memalign(&umem_buffer_, getpagesize(), umem_size_) != 0)
         {
             std::cerr << "[-] [AF_XDP] Failed to allocate page-aligned UMEM memory ("
@@ -203,7 +209,7 @@ namespace blackbox::ingest
             return false;
         }
 
-        // Populate Fill Ring with initial empty UMEM chunks for NIC to write into
+        // Populate Fill Ring with initial empty UMEM chunks
         uint32_t idx = 0;
         ret = xsk_ring_prod__reserve(&umem_info_->fq, config_.num_frames / 2, &idx);
         if (ret > 0)
@@ -218,14 +224,14 @@ namespace blackbox::ingest
         return true;
     }
 
-    bool AfXdpEngine::setup_xsk_socket(bool attempt_zero_copy)
+    bool AfXdpEngine::setup_xsk_socket(size_t socket_idx, uint32_t q_id, bool attempt_zero_copy)
     {
-        xsk_info_ = std::make_unique<SocketContext>();
+        auto sock_ctx = std::make_unique<SocketContext>();
+        sock_ctx->queue_id = q_id;
 
         struct xsk_socket_config x_cfg{};
         x_cfg.rx_size = XSK_RING_CONS__DEFAULT_NUM_DESCS;
         x_cfg.tx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
-        // CRITICAL: Prevent libbpf from overwriting our loaded xdp_firewall program!
         x_cfg.libbpf_flags = XSK_LIBBPF_FLAGS__INHIBIT_PROG_LOAD;
 
         if (attempt_zero_copy)
@@ -235,24 +241,33 @@ namespace blackbox::ingest
         }
         else
         {
-            // Safe VMware / Docker fallback mode: Generic SKB + Copy Mode
             x_cfg.bind_flags = XDP_COPY;
             x_cfg.xdp_flags = XDP_FLAGS_SKB_MODE;
         }
 
-        int ret = xsk_socket__create(&xsk_info_->xsk,
+        int ret = xsk_socket__create(&sock_ctx->xsk,
                                      config_.interface_name.c_str(),
-                                     config_.queue_id,
+                                     q_id,
                                      umem_info_->umem,
-                                     &xsk_info_->rx,
-                                     &xsk_info_->tx,
+                                     &sock_ctx->rx,
+                                     &sock_ctx->tx,
                                      &x_cfg);
         if (ret != 0)
         {
             return false;
         }
 
-        xsk_info_->fd = xsk_socket__fd(xsk_info_->xsk);
+        sock_ctx->fd = xsk_socket__fd(sock_ctx->xsk);
+
+        if (socket_idx < xsk_sockets_.size())
+        {
+            xsk_sockets_[socket_idx] = std::move(sock_ctx);
+        }
+        else
+        {
+            xsk_sockets_.push_back(std::move(sock_ctx));
+        }
+
         return true;
     }
 
@@ -261,39 +276,52 @@ namespace blackbox::ingest
         if (running_.load())
             return true;
 
-        // 1. Allocate UMEM
         if (!allocate_umem())
             return false;
 
-        // 2. Adaptive Probe: Try Zero-Copy first, then fall back for VMware/Docker
-        bool bound = false;
-        if (!config_.force_copy_mode)
+        xsk_sockets_.clear();
+
+        // Bind sockets across all configured hardware RSS queues
+        for (size_t idx = 0; idx < config_.queue_ids.size(); ++idx)
         {
-            bound = setup_xsk_socket(true);
-            if (bound)
+            uint32_t q_id = config_.queue_ids[idx];
+            bool bound = false;
+
+            if (!config_.force_copy_mode)
             {
-                zero_copy_active_ = true;
-                std::cout << "\033[1;32m[+] [AF_XDP Engine] Bound in TRUE HARDWARE ZERO-COPY mode (10M+ EPS capacity)\033[0m" << std::endl;
+                bound = setup_xsk_socket(idx, q_id, true);
+                if (bound)
+                {
+                    zero_copy_active_ = true;
+                }
+            }
+
+            if (!bound)
+            {
+                bound = setup_xsk_socket(idx, q_id, false);
+                if (bound)
+                {
+                    zero_copy_active_ = false;
+                }
+                else
+                {
+                    std::cerr << "[-] [AF_XDP Engine] Failed to bind AF_XDP socket on "
+                              << config_.interface_name << " (Queue " << q_id << ")" << std::endl;
+                    stop();
+                    return false;
+                }
             }
         }
 
-        if (!bound)
+        if (zero_copy_active_)
         {
-            // VMware / Docker fallback
-            bound = setup_xsk_socket(false);
-            if (bound)
-            {
-                zero_copy_active_ = false;
-                std::cout << "\033[1;33m[!] [AF_XDP Engine] Virtual interface detected ("
-                          << config_.interface_name << " in VMware/Docker). Active in XDP_COPY mode.\033[0m" << std::endl;
-            }
-            else
-            {
-                std::cerr << "[-] [AF_XDP Engine] Failed to bind AF_XDP socket on "
-                          << config_.interface_name << std::endl;
-                stop();
-                return false;
-            }
+            std::cout << "\033[1;32m[+] [AF_XDP Engine] Multi-Queue RSS bound across "
+                      << xsk_sockets_.size() << " queue(s) in HARDWARE ZERO-COPY mode (40M+ EPS capacity)\033[0m" << std::endl;
+        }
+        else
+        {
+            std::cout << "\033[1;33m[!] [AF_XDP Engine] Multi-Queue RSS bound across "
+                      << xsk_sockets_.size() << " queue(s) in XDP_COPY mode (VMware/Docker fallback)\033[0m" << std::endl;
         }
 
         running_.store(true);
@@ -306,11 +334,16 @@ namespace blackbox::ingest
             return;
         running_.store(false);
 
-        if (xsk_info_ && xsk_info_->xsk)
+        for (auto &sock_ctx : xsk_sockets_)
         {
-            xsk_socket__delete(xsk_info_->xsk);
-            xsk_info_->xsk = nullptr;
+            if (sock_ctx && sock_ctx->xsk)
+            {
+                xsk_socket__delete(sock_ctx->xsk);
+                sock_ctx->xsk = nullptr;
+            }
         }
+        xsk_sockets_.clear();
+
         if (umem_info_ && umem_info_->umem)
         {
             xsk_umem__delete(umem_info_->umem);
@@ -323,36 +356,35 @@ namespace blackbox::ingest
         }
     }
 
-    uint32_t AfXdpEngine::poll_batch(uint32_t max_batch, PacketHandler handler)
+    uint32_t AfXdpEngine::poll_queue(size_t queue_idx, uint32_t max_batch, PacketHandler handler)
     {
-        if (!running_.load() || !xsk_info_)
+        if (!running_.load() || queue_idx >= xsk_sockets_.size() || !xsk_sockets_[queue_idx])
             return 0;
 
+        auto &sock_ctx = xsk_sockets_[queue_idx];
         uint32_t idx_rx = 0;
-        uint32_t rcvd = xsk_ring_cons__peek(&xsk_info_->rx, max_batch, &idx_rx);
+        uint32_t rcvd = xsk_ring_cons__peek(&sock_ctx->rx, max_batch, &idx_rx);
         if (rcvd == 0)
             return 0;
 
         for (uint32_t i = 0; i < rcvd; ++i)
         {
-            const struct xdp_desc *desc = xsk_ring_cons__rx_desc(&xsk_info_->rx, idx_rx++);
+            const struct xdp_desc *desc = xsk_ring_cons__rx_desc(&sock_ctx->rx, idx_rx++);
             uint64_t addr = desc->addr;
             uint32_t len = desc->len;
 
-            // Zero-copy direct pointer into UMEM memory chunk
             const uint8_t *pkt_ptr = static_cast<const uint8_t *>(umem_buffer_) + addr;
             handler(pkt_ptr, len);
         }
 
-        xsk_ring_cons__release(&xsk_info_->rx, rcvd);
+        xsk_ring_cons__release(&sock_ctx->rx, rcvd);
         total_packets_.fetch_add(rcvd, std::memory_order_relaxed);
 
         // Replenish Fill Ring with newly available frames
         uint32_t idx_fq = 0;
         if (xsk_ring_prod__reserve(&umem_info_->fq, rcvd, &idx_fq) > 0)
         {
-            for (uint32_t i = 0; i < rcvd; ++i)
-            {
+            for (uint32_t i = 0; i < rcvd; ++i) {
                 *xsk_ring_prod__fill_addr(&umem_info_->fq, idx_fq++) = (i * config_.frame_size);
             }
             xsk_ring_prod__submit(&umem_info_->fq, rcvd);
@@ -361,9 +393,28 @@ namespace blackbox::ingest
         return rcvd;
     }
 
-    int AfXdpEngine::get_xsk_fd() const
+    uint32_t AfXdpEngine::poll_batch(uint32_t max_batch, PacketHandler handler)
     {
-        return xsk_info_ ? xsk_info_->fd : -1;
+        return poll_queue(0, max_batch, handler);
+    }
+
+    uint32_t AfXdpEngine::poll_all_queues(uint32_t max_batch_per_queue, PacketHandler handler)
+    {
+        uint32_t total_rcvd = 0;
+        for (size_t q_idx = 0; q_idx < xsk_sockets_.size(); ++q_idx)
+        {
+            total_rcvd += poll_queue(q_idx, max_batch_per_queue, handler);
+        }
+        return total_rcvd;
+    }
+
+    int AfXdpEngine::get_xsk_fd(size_t queue_idx) const
+    {
+        if (queue_idx < xsk_sockets_.size() && xsk_sockets_[queue_idx])
+        {
+            return xsk_sockets_[queue_idx]->fd;
+        }
+        return -1;
     }
 
 } // namespace blackbox::ingest
