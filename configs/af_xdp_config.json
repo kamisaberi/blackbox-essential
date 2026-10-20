@@ -4,7 +4,10 @@
     "network": {
         "interface_name": "ens160",
         "queue_ids": [
-            0
+            0,
+            1,
+            2,
+            3
         ],
         "bind_mode": "AUTO_DETECT",
         "vmware_skb_fallback": true
