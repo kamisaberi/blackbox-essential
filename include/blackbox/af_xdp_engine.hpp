@@ -19,10 +19,11 @@ namespace blackbox::ingest
     struct BLACKBOX_API AfXdpConfig
     {
         std::string interface_name{"ens160"};
-        uint32_t queue_id{0};
+        uint32_t queue_id{0};               // Primary single queue ID (Backward Compatible)
+        std::vector<uint32_t> queue_ids{0}; // Multi-Queue RSS hardware queue list (e.g. [0, 1, 2, 3])
         uint32_t num_frames{4096};
         uint32_t frame_size{4096};
-        bool force_copy_mode{true}; // True for VMware/Docker virtual interfaces
+        bool force_copy_mode{true};         // True for VMware/Docker virtual interfaces
 
         /// Load dynamic engine configuration from JSON file
         static AfXdpConfig load_from_json(const std::string &json_path);
@@ -40,34 +41,42 @@ namespace blackbox::ingest
         AfXdpEngine(const AfXdpEngine &) = delete;
         AfXdpEngine &operator=(const AfXdpEngine &) = delete;
 
-        /// Initialize UMEM memory pool, configure rings, and bind AF_XDP socket
+        /// Initialize UMEM memory pool, configure rings, and bind AF_XDP socket(s)
         bool start();
 
-        /// Stop rings and release UMEM
+        /// Stop rings and release UMEM & sockets
         void stop();
 
-        /// Poll and process a batch of frames from Rx ring
+        /// Poll and process a batch of frames from primary Rx ring (Queue 0 - Backward Compatible)
         uint32_t poll_batch(uint32_t max_batch, PacketHandler handler);
+
+        /// Poll a specific hardware RSS queue socket
+        uint32_t poll_queue(size_t queue_idx, uint32_t max_batch, PacketHandler handler);
+
+        /// Poll across all active multi-queue sockets (Multi-Queue RSS 40M+ EPS)
+        uint32_t poll_all_queues(uint32_t max_batch_per_queue, PacketHandler handler);
 
         [[nodiscard]] bool is_zero_copy_active() const { return zero_copy_active_; }
         [[nodiscard]] bool is_running() const { return running_.load(); }
         [[nodiscard]] uint64_t total_packets_received() const { return total_packets_.load(); }
-        [[nodiscard]] int get_xsk_fd() const;
+        [[nodiscard]] size_t active_queue_count() const { return xsk_sockets_.size(); }
+        [[nodiscard]] int get_xsk_fd() const { return get_xsk_fd(0); }
+        [[nodiscard]] int get_xsk_fd(size_t queue_idx) const;
 
     private:
         bool allocate_umem();
-        bool setup_xsk_socket(bool attempt_zero_copy);
+        bool setup_xsk_socket(size_t socket_idx, uint32_t q_id, bool attempt_zero_copy);
 
         AfXdpConfig config_;
         std::atomic<bool> running_{false};
         bool zero_copy_active_{false};
 
-        // UMEM & Rings internal state
+        // UMEM & Multi-Queue Rings internal state
         void *umem_buffer_{nullptr};
         size_t umem_size_{0};
 
         std::unique_ptr<UmemContext> umem_info_;
-        std::unique_ptr<SocketContext> xsk_info_;
+        std::vector<std::unique_ptr<SocketContext>> xsk_sockets_; // Multi-queue RSS socket contexts
 
         std::atomic<uint64_t> total_packets_{0};
     };
