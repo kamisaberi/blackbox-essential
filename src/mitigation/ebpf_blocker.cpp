@@ -12,7 +12,6 @@
 namespace blackbox::mitigation
 {
 
-    // Must match the layout in xdp_drop.c
     struct KernelDeceptionTarget {
         uint32_t decoy_ip;
         uint16_t decoy_port;
@@ -25,7 +24,6 @@ namespace blackbox::mitigation
     EBPFBlocker::EBPFBlocker(std::string interface_name)
         : interface_name_(std::move(interface_name))
     {
-        // Dynamic interface resolution (ens160, ens33, ens192, eth0)
         ifindex_ = if_nametoindex(interface_name_.c_str());
         if (ifindex_ == 0)
         {
@@ -41,7 +39,6 @@ namespace blackbox::mitigation
                 }
             }
         }
-
         attach_xdp_program("src/mitigation/xdp_drop.o");
     }
 
@@ -99,6 +96,8 @@ namespace blackbox::mitigation
         map_fd_ = bpf_object__find_map_fd_by_name(obj, "blocked_ip_map");
         xsks_map_fd_ = bpf_object__find_map_fd_by_name(obj, "xsks_map");
         deception_map_fd_ = bpf_object__find_map_fd_by_name(obj, "deception_map");
+        teid_slice_map_fd_ = bpf_object__find_map_fd_by_name(obj, "teid_slice_map");
+        slice_drop_map_fd_ = bpf_object__find_map_fd_by_name(obj, "slice_drop_map");
         bpf_obj_ = obj;
 
         unsigned int xdp_flags = XDP_FLAGS_SKB_MODE;
@@ -109,7 +108,7 @@ namespace blackbox::mitigation
         }
 
         std::cout << "[eBPF Kernel Driver] Attached native XDP filter (" << resolved_path << ") to: "
-                  << interface_name_ << " (SKB Mode active)." << std::endl;
+                  << interface_name_ << " (5G Slicing & Deception active)." << std::endl;
         return true;
     }
 
@@ -133,19 +132,12 @@ namespace blackbox::mitigation
             return false;
 
         int ret = bpf_map_update_elem(xsks_map_fd_, &queue_id, &xsk_fd, BPF_ANY);
-        if (ret == 0)
-        {
-            std::cout << "[eBPF Core] Bound XSK socket (FD: " << xsk_fd
-                      << ") to queue " << queue_id << " in xsks_map." << std::endl;
-            return true;
-        }
-        return false;
+        return (ret == 0);
     }
 
     bool EBPFBlocker::block_ip(const std::string &ip_address)
     {
         std::lock_guard<std::mutex> lock(blocker_mutex_);
-
         if (blocked_ips_.find(ip_address) != blocked_ips_.end())
             return true;
 
@@ -161,7 +153,6 @@ namespace blackbox::mitigation
             int res = bpf_map_update_elem(map_fd_, &key, &initial_counter, BPF_ANY);
             if (res == 0)
             {
-                std::cout << "[eBPF Native Kernel] Inserted IP into blocked_ip_map: " << ip_address << std::endl;
                 blocked_ips_.insert(ip_address);
                 return true;
             }
@@ -181,9 +172,7 @@ namespace blackbox::mitigation
         {
             bpf_map_delete_elem(map_fd_, &key);
         }
-
         blocked_ips_.erase(ip_address);
-        std::cout << "[eBPF Native Kernel] Removed IP from blocked_ip_map: " << ip_address << std::endl;
         return true;
     }
 
@@ -193,16 +182,13 @@ namespace blackbox::mitigation
                                            const std::string &decoy_mac)
     {
         std::lock_guard<std::mutex> lock(blocker_mutex_);
-
         if (deception_map_fd_ < 0)
             return false;
 
         struct in_addr src_addr, dst_addr;
         if (inet_pton(AF_INET, attacker_ip.c_str(), &src_addr) != 1 ||
             inet_pton(AF_INET, decoy_ip.c_str(), &dst_addr) != 1)
-        {
             return false;
-        }
 
         KernelDeceptionTarget target{};
         target.decoy_ip = dst_addr.s_addr;
@@ -226,9 +212,6 @@ namespace blackbox::mitigation
         if (res == 0)
         {
             deceived_ips_.insert(attacker_ip);
-            std::cout << "[eBPF Honeynet Core] Redirected attacker " << attacker_ip
-                      << " -> Decoy PLC " << decoy_ip << " (Port: "
-                      << (decoy_port ? std::to_string(decoy_port) : "PRESERVE") << ")" << std::endl;
             return true;
         }
         return false;
@@ -247,7 +230,6 @@ namespace blackbox::mitigation
         uint32_t key = addr.s_addr;
         bpf_map_delete_elem(deception_map_fd_, &key);
         deceived_ips_.erase(attacker_ip);
-        std::cout << "[eBPF Honeynet Core] Cleared deception routing for: " << attacker_ip << std::endl;
         return true;
     }
 
@@ -264,10 +246,77 @@ namespace blackbox::mitigation
         uint32_t key = addr.s_addr;
         KernelDeceptionTarget target{};
         if (bpf_map_lookup_elem(deception_map_fd_, &key, &target) == 0)
-        {
             return target.hit_counter;
-        }
         return 0;
+    }
+
+    // -------------------------------------------------------------------------
+    // IDEA B: 5G/6G NETWORK SLICING APIS
+    // -------------------------------------------------------------------------
+    bool EBPFBlocker::register_5g_slice(uint32_t teid, uint32_t sst, uint32_t sd,
+                                       const std::vector<uint16_t> &allowed_ports,
+                                       uint8_t isolation,
+                                       const std::string &allowed_ip)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+        if (teid_slice_map_fd_ < 0)
+            return false;
+
+        KernelSlicePolicy policy{};
+        policy.sst = sst;
+        policy.sd = sd;
+        policy.isolation_level = isolation;
+
+        if (!allowed_ip.empty() && allowed_ip != "0.0.0.0")
+        {
+            struct in_addr addr;
+            if (inet_pton(AF_INET, allowed_ip.c_str(), &addr) == 1)
+                policy.allowed_inner_ip = addr.s_addr;
+        }
+
+        for (size_t i = 0; i < allowed_ports.size() && i < 4; ++i)
+        {
+            policy.allowed_ports[i] = allowed_ports[i];
+        }
+
+        int res = bpf_map_update_elem(teid_slice_map_fd_, &teid, &policy, BPF_ANY);
+        if (res == 0)
+        {
+            std::cout << "[eBPF 5G Core] Enrolled Slice: TEID 0x" << std::hex << teid
+                      << " -> SST " << std::dec << sst << " (SD: " << sd << ")" << std::endl;
+            return true;
+        }
+        return false;
+    }
+
+    bool EBPFBlocker::revoke_5g_slice(uint32_t teid)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+        if (teid_slice_map_fd_ < 0)
+            return false;
+
+        int res = bpf_map_delete_elem(teid_slice_map_fd_, &teid);
+        return (res == 0);
+    }
+
+    bool EBPFBlocker::get_5g_slice_policy(uint32_t teid, KernelSlicePolicy &out_policy)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+        if (teid_slice_map_fd_ < 0)
+            return false;
+
+        return (bpf_map_lookup_elem(teid_slice_map_fd_, &teid, &out_policy) == 0);
+    }
+
+    uint64_t EBPFBlocker::get_5g_slice_violations(uint32_t sst)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+        if (slice_drop_map_fd_ < 0)
+            return 0;
+
+        uint64_t count = 0;
+        bpf_map_lookup_elem(slice_drop_map_fd_, &sst, &count);
+        return count;
     }
 
 } // namespace blackbox::mitigation
