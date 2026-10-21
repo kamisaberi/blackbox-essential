@@ -12,6 +12,16 @@
 namespace blackbox::mitigation
 {
 
+    // Must match the layout in xdp_drop.c
+    struct KernelDeceptionTarget {
+        uint32_t decoy_ip;
+        uint16_t decoy_port;
+        uint8_t  decoy_mac[6];
+        uint8_t  rewrite_mac;
+        uint8_t  pad;
+        uint64_t hit_counter;
+    };
+
     EBPFBlocker::EBPFBlocker(std::string interface_name)
         : interface_name_(std::move(interface_name))
     {
@@ -45,7 +55,6 @@ namespace blackbox::mitigation
         if (ifindex_ == 0)
             return false;
 
-        // Smart Multi-Path Resolution (handles running from root, build/, or system install)
         std::vector<std::string> search_paths = {
             bpf_obj_path,
             "../" + bpf_obj_path,
@@ -89,9 +98,9 @@ namespace blackbox::mitigation
         prog_fd_ = bpf_program__fd(prog);
         map_fd_ = bpf_object__find_map_fd_by_name(obj, "blocked_ip_map");
         xsks_map_fd_ = bpf_object__find_map_fd_by_name(obj, "xsks_map");
+        deception_map_fd_ = bpf_object__find_map_fd_by_name(obj, "deception_map");
         bpf_obj_ = obj;
 
-        // Attach in XDP Generic / SKB Mode (100% compatibility in VMware / Docker)
         unsigned int xdp_flags = XDP_FLAGS_SKB_MODE;
         if (bpf_xdp_attach(ifindex_, prog_fd_, xdp_flags, nullptr) < 0)
         {
@@ -138,15 +147,11 @@ namespace blackbox::mitigation
         std::lock_guard<std::mutex> lock(blocker_mutex_);
 
         if (blocked_ips_.find(ip_address) != blocked_ips_.end())
-        {
             return true;
-        }
 
         struct in_addr addr;
         if (inet_pton(AF_INET, ip_address.c_str(), &addr) != 1)
-        {
             return false;
-        }
 
         uint32_t key = addr.s_addr;
         uint64_t initial_counter = 0;
@@ -161,7 +166,6 @@ namespace blackbox::mitigation
                 return true;
             }
         }
-
         return false;
     }
 
@@ -170,9 +174,7 @@ namespace blackbox::mitigation
         std::lock_guard<std::mutex> lock(blocker_mutex_);
         struct in_addr addr;
         if (inet_pton(AF_INET, ip_address.c_str(), &addr) != 1)
-        {
             return false;
-        }
 
         uint32_t key = addr.s_addr;
         if (map_fd_ >= 0)
@@ -183,6 +185,89 @@ namespace blackbox::mitigation
         blocked_ips_.erase(ip_address);
         std::cout << "[eBPF Native Kernel] Removed IP from blocked_ip_map: " << ip_address << std::endl;
         return true;
+    }
+
+    bool EBPFBlocker::redirect_to_deception(const std::string &attacker_ip,
+                                           const std::string &decoy_ip,
+                                           uint16_t decoy_port,
+                                           const std::string &decoy_mac)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+
+        if (deception_map_fd_ < 0)
+            return false;
+
+        struct in_addr src_addr, dst_addr;
+        if (inet_pton(AF_INET, attacker_ip.c_str(), &src_addr) != 1 ||
+            inet_pton(AF_INET, decoy_ip.c_str(), &dst_addr) != 1)
+        {
+            return false;
+        }
+
+        KernelDeceptionTarget target{};
+        target.decoy_ip = dst_addr.s_addr;
+        target.decoy_port = (decoy_port != 0) ? htons(decoy_port) : 0;
+        target.hit_counter = 0;
+
+        if (!decoy_mac.empty())
+        {
+            unsigned int mac[6];
+            if (sscanf(decoy_mac.c_str(), "%x:%x:%x:%x:%x:%x",
+                       &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]) == 6)
+            {
+                for (int i = 0; i < 6; ++i)
+                    target.decoy_mac[i] = static_cast<uint8_t>(mac[i]);
+                target.rewrite_mac = 1;
+            }
+        }
+
+        uint32_t key = src_addr.s_addr;
+        int res = bpf_map_update_elem(deception_map_fd_, &key, &target, BPF_ANY);
+        if (res == 0)
+        {
+            deceived_ips_.insert(attacker_ip);
+            std::cout << "[eBPF Honeynet Core] Redirected attacker " << attacker_ip
+                      << " -> Decoy PLC " << decoy_ip << " (Port: "
+                      << (decoy_port ? std::to_string(decoy_port) : "PRESERVE") << ")" << std::endl;
+            return true;
+        }
+        return false;
+    }
+
+    bool EBPFBlocker::clear_deception(const std::string &attacker_ip)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+        if (deception_map_fd_ < 0)
+            return false;
+
+        struct in_addr addr;
+        if (inet_pton(AF_INET, attacker_ip.c_str(), &addr) != 1)
+            return false;
+
+        uint32_t key = addr.s_addr;
+        bpf_map_delete_elem(deception_map_fd_, &key);
+        deceived_ips_.erase(attacker_ip);
+        std::cout << "[eBPF Honeynet Core] Cleared deception routing for: " << attacker_ip << std::endl;
+        return true;
+    }
+
+    uint64_t EBPFBlocker::get_deception_hits(const std::string &attacker_ip)
+    {
+        std::lock_guard<std::mutex> lock(blocker_mutex_);
+        if (deception_map_fd_ < 0)
+            return 0;
+
+        struct in_addr addr;
+        if (inet_pton(AF_INET, attacker_ip.c_str(), &addr) != 1)
+            return 0;
+
+        uint32_t key = addr.s_addr;
+        KernelDeceptionTarget target{};
+        if (bpf_map_lookup_elem(deception_map_fd_, &key, &target) == 0)
+        {
+            return target.hit_counter;
+        }
+        return 0;
     }
 
 } // namespace blackbox::mitigation
