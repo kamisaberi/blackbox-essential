@@ -80,7 +80,6 @@ target_link_libraries(blackbox PUBLIC
     OpenSSL::Crypto
 )
 
-
 # Attach OpenVINO runtime if detected
 if(OpenVINO_FOUND)
     target_link_libraries(blackbox PUBLIC openvino::runtime)
@@ -101,7 +100,6 @@ target_link_libraries(blackbox_daemon PRIVATE
     bpf 
     elf
     ${XDP_LIB}
-
 )
 
 if(BLACKBOX_BUILD_TESTS)
@@ -112,8 +110,6 @@ endif()
 # Installation Rules
 install(TARGETS blackbox DESTINATION /usr/local/lib)
 install(DIRECTORY include/blackbox DESTINATION /usr/local/include)
-
-
 
 # -------------------------------------------------------------------
 # AF_XDP EXAMPLES & BENCHMARKS
@@ -133,3 +129,40 @@ target_link_libraries(test_af_xdp_live PRIVATE
     bpf
     Threads::Threads
 )
+
+# ===================================================================
+# --- IN-KERNEL eBPF COMPILATION PIPELINE (xdp_drop.o & live_sbom.o) ---
+# ===================================================================
+find_program(CLANG_EXECUTABLE clang REQUIRED)
+
+set(BPF_CFLAGS -O2 -g -target bpf -D__TARGET_ARCH_x86 -I${CMAKE_CURRENT_SOURCE_DIR}/src/mitigation -I/usr/include/x86_64-linux-gnu)
+
+set(XDP_DROP_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/mitigation/xdp_drop.c)
+set(XDP_DROP_OBJ ${CMAKE_CURRENT_SOURCE_DIR}/src/mitigation/xdp_drop.o)
+
+add_custom_command(
+    OUTPUT ${XDP_DROP_OBJ}
+    COMMAND ${CLANG_EXECUTABLE} ${BPF_CFLAGS} -c ${XDP_DROP_SRC} -o ${XDP_DROP_OBJ}
+    DEPENDS ${XDP_DROP_SRC}
+    COMMENT "[eBPF Pipeline] Compiling in-kernel XDP filter: xdp_drop.o"
+)
+
+set(LIVE_SBOM_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/mitigation/live_sbom.c)
+set(LIVE_SBOM_OBJ ${CMAKE_CURRENT_SOURCE_DIR}/src/mitigation/live_sbom.o)
+
+if(EXISTS ${LIVE_SBOM_SRC})
+    add_custom_command(
+        OUTPUT ${LIVE_SBOM_OBJ}
+        COMMAND ${CLANG_EXECUTABLE} ${BPF_CFLAGS} -c ${LIVE_SBOM_SRC} -o ${LIVE_SBOM_OBJ}
+        DEPENDS ${LIVE_SBOM_SRC}
+        COMMENT "[eBPF Pipeline] Compiling in-kernel Live-SBOM tracepoint: live_sbom.o"
+    )
+    add_custom_target(ebpf_all ALL DEPENDS ${XDP_DROP_OBJ} ${LIVE_SBOM_OBJ})
+    install(FILES ${LIVE_SBOM_OBJ} DESTINATION /etc/sentinel)
+    install(FILES ${LIVE_SBOM_OBJ} DESTINATION /usr/local/lib/blackbox)
+else()
+    add_custom_target(ebpf_all ALL DEPENDS ${XDP_DROP_OBJ})
+endif()
+
+install(FILES ${XDP_DROP_OBJ} DESTINATION /etc/sentinel)
+install(FILES ${XDP_DROP_OBJ} DESTINATION /usr/local/lib/blackbox)
