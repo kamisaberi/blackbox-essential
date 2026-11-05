@@ -1,19 +1,11 @@
-# AF_XDP Zero-Copy
+# AF_XDP Zero-Copy Architecture
 
-> **Status:** Draft — placeholder content. Final technical prose is forthcoming.
+AF_XDP (Address Family XDP) provides direct packet streaming between NIC hardware and user-space memory pools without traversing the kernel TCP/IP stack.
 
-Section overview for AF_XDP Zero-Copy — start with any guide below.
+## Section Navigation
 
-- [Line-Rate Saturation on 10GbE](./line-rate-saturation-10gbe.md)
-
-- [Multi-Core RSS Queues](./multi-core-rss-queues.md)
-
-- [RX & Fill Rings](./rx-fill-rings.md)
-
-- [UMEM Architecture](./umem-architecture.md)
-
-- [Zero-Copy Packet Transfer](./zero-copy-packet-transfer.md)
-
----
-
-*Part of the blackbox-essential documentation set.*
+- [UMEM Architecture](./umem-architecture.md): Memory pool allocation, 4096-byte chunk layouts, and aligned vs. unaligned modes.
+- [Rx & Fill Rings](./rx-fill-rings.md): Coordinating memory handoffs across the 4 lock-free AF_XDP circular rings.
+- [Zero-Copy Transfer](./zero-copy-packet-transfer.md): Hardware DMA transfers directly into user-space UMEM chunks and `xinfer::Tensor` aliasing.
+- [10GbE Line-Rate Saturation](./line-rate-saturation-10gbe.md): NIC compatibility matrix, kernel sysctl optimizations, and saturation profiles.
+- [Multi-Core RSS Queues](./multi-core-rss-queues.md): Scaling packet ingestion across multi-queue NICs using Receive Side Scaling.

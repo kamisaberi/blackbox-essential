@@ -1,34 +1,14 @@
 # API Reference Overview
 
-The `blackbox-essential` C++20 API provides a high-performance, deterministic programming interface for configuring Linux eBPF/XDP kernel filters, managing lock-free Single-Producer Multi-Consumer (SPMC) ring buffers, and generating cryptographic TPM 2.0 hardware attestation claims.
+The `blackbox-essential` C++20 API provides a high-performance, deterministic programming interface for controlling eBPF kernel filters, lock-free ring buffers, and TPM 2.0 attestation.
 
----
+## Section Navigation
 
-## 1. Header Organization
-
-Include the primary umbrella header to access all core capabilities:
-
-```cpp
-#include <blackbox/blackbox.hpp>
-```
-
-Alternatively, include modular headers for granular compilation:
-
-| Header File | Primary Declarations |
-| :--- | :--- |
-| `<blackbox/xdp_manager.hpp>` | Class `blackbox::XdpManager`, `XdpConfig`, `XdpAttachMode` |
-| `<blackbox/event_ring_buffer.hpp>` | Class `blackbox::EventRingBuffer`, `FlowEvent` |
-| `<blackbox/hardware_identity.hpp>` | Class `blackbox::HardwareIdentity`, `IdentityClaims`, `IdentityTier` |
-| `<blackbox/model_config.hpp>` | Class `blackbox::ModelConfig`, `DynamicTensorBinder` |
-| `<blackbox/telemetry.hpp>` | Struct `blackbox::KernelTelemetry`, `RingBufferMetrics` |
-| `<blackbox/types.hpp>` | Common types, `BlockedIpEntry`, network byte order helpers |
-| `<blackbox/exception.hpp>` | Class `blackbox::BlackboxException`, enum `ErrorCode` |
-
----
-
-## 2. Invariants & Design Principles
-
-1. **Explicit Resource Boundaries (RAII):** Attaching to network drivers and binding TPM contexts acquire persistent system resources. Destructors guarantee that eBPF programs are cleanly unhooked and hardware session handles are released.
-2. **Zero-Copy Interoperability:** Network payloads, telemetry frames, and tensor views interface via non-owning `std::span` buffers, preventing heap churn on the critical path.
-3. **Deterministic Error Handling:** Methods on the microsecond mitigation path use `noexcept` specifications and return status codes, while initialization and configuration routines raise strongly-typed `BlackboxException` instances on unrecoverable failures.
-
+- [API Reference Overview](./index.md): Header organization, RAII boundaries, and error design.
+- [XdpManager](./xdp-manager.md): Class `blackbox::XdpManager` for BPF program loading and map mutation.
+- [EventRingBuffer](./event-ring-buffer.md): Class `blackbox::EventRingBuffer` SPMC ring queue.
+- [HardwareIdentity](./hardware-identity.md): Class `blackbox::HardwareIdentity` for TPM 2.0 quote generation.
+- [ModelConfig](./model-config.md): Class `blackbox::ModelConfig` for YAML parsing and tensor binding.
+- [KernelTelemetry](./kernel-telemetry.md): Struct `blackbox::KernelTelemetry` for per-CPU eBPF drop counters.
+- [Data Structures](./data-structures.md): Common configuration structs (`XdpConfig`, `BlockedIpEntry`, `FlowEvent`).
+- [Error Codes & Exceptions](./error-codes.md): Class `blackbox::BlackboxException` and `ErrorCode` enum.
